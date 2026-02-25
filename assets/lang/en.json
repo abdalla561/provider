@@ -1,0 +1,17 @@
+{
+  "welcome": "Welcome",
+  "change_theme": "Change Theme (Light/Dark)",
+  "change_language": "Change Language",
+
+  
+  "app_name": "QuickServe",
+  "welcome_title": "Your daily services, faster and easier.",
+  "welcome_subtitle": "Connecting you with reliable professionals in moments.",
+  "login": "Login",
+  "create_account": "Create New Account",
+  "terms_agreement": "By logging in, you agree to the ",
+  "terms_of_service": "Terms of Service",
+  "and": " and ",
+  "privacy_policy": "Privacy Policy"
+
+}

@@ -1,0 +1,17 @@
+{
+  "welcome": "مرحباً بك  ",
+  "change_theme": "تغيير الوضع (فاتح/داكن)",
+  "change_language": "تغيير اللغة",
+  
+  "app_name": "QuickServe",
+  "welcome_title": "خدماتك اليومية، أسرع وأسهل.",
+  "welcome_subtitle": "نصلك بمحترفين موثوقين في لحظات.",
+  "login": "تسجيل الدخول",
+  "create_account": "إنشاء حساب جديد",
+  "terms_agreement": "بتسجيل الدخول، أنت توافق على ",
+  "terms_of_service": "شروط الخدمة",
+  "and": " و ",
+  "privacy_policy": "سياسة الخصوصية"
+
+
+}
