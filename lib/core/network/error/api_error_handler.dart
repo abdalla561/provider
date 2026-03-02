@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'failure.dart';
@@ -71,8 +70,56 @@ class ApiErrorHandler {
   }
 
   /// 📥 معالجة الردود السيئة من السيرفر (4xx, 5xx)
+  // static String _handleBadResponse(Response? response) {
+  //   try {
+  //     if (response != null && response.data != null) {
+  //       if (response.data is Map) {
+  //         if (response.data.containsKey('message')) {
+  //           return response.data['message'];
+  //         } else if (response.data.containsKey('error')) {
+  //           return response.data['error'];
+  //         }
+  //       } else if (response.data is String) {
+  //         return response.data;
+  //       }
+  //     }
+  //     switch (response?.statusCode) {
+  //       case 400:
+  //         return 'طلب غير صالح (Bad Request).';
+  //       case 401:
+  //         return 'غير مصرح لك بالوصول (Unauthorized).';
+  //       case 403:
+  //         return 'تم رفض الوصول (Forbidden).';
+  //       case 404:
+  //         return 'الرابط غير موجود (Not Found).';
+  //       case 500:
+  //         return 'حدث خطأ في السيرفر الداخلي (Internal Server Error).';
+  //       case 503:
+  //         return 'الخدمة غير متوفرة حالياً (Service Unavailable).';
+  //       default:
+  //         return 'حدث خطأ في الاستجابة (Code: ${response?.statusCode}).';
+  //     }
+  //   } catch (e) {
+  //     return 'حدث خطأ في قراءة رد السيرفر.';
+  //   }
+  // }
+  /// 📥 معالجة الردود السيئة من السيرفر (4xx, 5xx)
   static String _handleBadResponse(Response? response) {
     try {
+      final statusCode = response?.statusCode;
+
+      // 🎯 1. نلتقط الأخطاء الحساسة أولاً لنعرض رسائلنا المخصصة (بالعربي)
+      if (statusCode == 403) {
+        return 'عذراً، حسابك الحالي لا يملك صلاحية (مقدم خدمة) للقيام بهذا الإجراء.';
+      } else if (statusCode == 401) {
+        return 'انتهت جلسة الدخول، يرجى تسجيل الدخول مجدداً.';
+      } else if (statusCode == 404) {
+        return 'الرابط المطلوب غير موجود (Not Found).';
+      } else if (statusCode != null && statusCode >= 500) {
+        return 'يوجد خلل في السيرفر حالياً، يرجى المحاولة لاحقاً.';
+      }
+
+      // 🎯 2. إذا لم يكن من الأخطاء السابقة، نحاول قراءة الرسالة القادمة من الباك اند
       if (response != null && response.data != null) {
         if (response.data is Map) {
           if (response.data.containsKey('message')) {
@@ -84,21 +131,15 @@ class ApiErrorHandler {
           return response.data;
         }
       }
-      switch (response?.statusCode) {
+
+      // 🎯 3. كود احتياطي للأخطاء الأخرى غير المعروفة
+      switch (statusCode) {
         case 400:
           return 'طلب غير صالح (Bad Request).';
-        case 401:
-          return 'غير مصرح لك بالوصول (Unauthorized).';
-        case 403:
-          return 'تم رفض الوصول (Forbidden).';
-        case 404:
-          return 'الرابط غير موجود (Not Found).';
-        case 500:
-          return 'حدث خطأ في السيرفر الداخلي (Internal Server Error).';
         case 503:
           return 'الخدمة غير متوفرة حالياً (Service Unavailable).';
         default:
-          return 'حدث خطأ في الاستجابة (Code: ${response?.statusCode}).';
+          return 'حدث خطأ في الاستجابة (Code: $statusCode).';
       }
     } catch (e) {
       return 'حدث خطأ في قراءة رد السيرفر.';

@@ -12,6 +12,69 @@
   "terms_agreement": "By logging in, you agree to the ",
   "terms_of_service": "Terms of Service",
   "and": " and ",
-  "privacy_policy": "Privacy Policy"
+  "privacy_policy": "Privacy Policy",
+
+  "service_provider": "Service Provider",
+  "welcome_partner": "Welcome, Partner",
+  "login_subtitle": "Please log in to manage your services and access the dashboard",
+  "email_label": "Email",
+  "email_hint": "partner@quickserve.com",
+  "password_label": "Password",
+  "password_hint": "........",
+  "forgot_password": "Forgot password?",
+  "or": "Or",
+  "version": "Version QuickServe © 2.4.0",
+
+
+
+  "welcome_back": "Welcome back 👋",
+  "weekly_earnings": "Weekly Earnings",
+  "sar": "SAR",
+  "general_rating": "General Rating",
+  "new_requests": "New Requests",
+  "view_all": "View All",
+  "accept_request": "Accept Request",
+  "active_services": "Active Services",
+  "in_progress": "In Progress",
+  "client": "Client:",
+  "view_details": "View Details",
+  "nav_home": "Home",
+  "nav_orders": "Orders",
+  "nav_services": "Services",
+  "nav_commissions": "Commissions",
+  "nav_settings": "Settings",
+
+
+"manage_services": "Manage Services",
+  "help": "Help",
+  "search_service": "Search for a service...",
+  "filter_all": "All",
+  "filter_active": "Active",
+  "filter_draft": "Draft",
+  "filter_suspended": "Suspended",
+  "no_services_currently": "No services available currently.",
+  "quick_sub_services": "Quick Sub-services",
+  "manage_all": "Manage All",
+  "edit": "Edit",
+  "sub_services_count": "Sub-services ({count})",
+
+
+
+
+
+  "add_new_service": "Add New Service",
+  "upload_service_image": "Upload Service Image",
+  "recommended_image_size": "Preferred size 16:9 in high quality",
+  "service_details": "Service Details",
+  "service_name": "Service Name",
+  "service_name_hint": "Example: Split AC Cleaning",
+  "category": "Category",
+  "choose_category": "Choose the appropriate category",
+  "base_price": "Base Price",
+  "service_description": "Service Description",
+  "service_description_hint": "Explain the service details to customers, what it includes and its features...",
+  "publish_service": "Publish Service",
+  "fill_required_fields": "Please fill in the required fields (Name, Category, Price)",
+  "service_published_successfully": "Service published successfully!"
 
 }

@@ -13,10 +13,10 @@ class CustomColor {
   // ===========================================================================
 
   /// لون النصوص الرئيسي في الوضع الفاتح (أسود داكن).
-  static const Color lightText = Color(0xFF0A0E10);
+  static const Color lightText = Color.fromARGB(255, 0, 0, 0);
 
   /// لون النصوص الفرعية أو الوصف (رمادي).
-  static const Color lightTextSub = Color(0xFF5F6B7A);
+  static const Color lightTextSub = Color.fromARGB(255, 44, 45, 46);
 
   /// لون الخلفية في الوضع الفاتح (أبيض مائل للزرقة الخفيفة جداً).
   static const Color lightBackground = Color(0xFFF8FBFC);
