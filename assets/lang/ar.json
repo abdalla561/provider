@@ -70,6 +70,54 @@
   "service_description_hint": "اشرح للعملاء تفاصيل الخدمة، ماذا تشمل وما هي المميزات التي تقدمها...",
   "publish_service": "نشر الخدمة",
   "fill_required_fields": "يرجى تعبئة الحقول الأساسية (الاسم، الفئة، السعر)",
-  "service_published_successfully": "تم نشر الخدمة بنجاح!"
+  "service_published_successfully": "تم نشر الخدمة بنجاح!",
 
+
+"service_details": "تفاصيل الخدمة",
+  "edit_data": "تعديل البيانات",
+  "delete_service": "حذف الخدمة",
+  "sub_services": "الخدمات الفرعية",
+  "add_sub_service": "إضافة خدمة فرعية",
+  "services_count": "{count} خدمات",
+  "delete_confirm_title": "تأكيد الحذف",
+  "delete_confirm_msg": "هل أنت متأكد أنك تريد حذف هذه الخدمة نهائياً؟",
+  "cancel": "إلغاء",
+  "confirm": "تأكيد",
+
+
+
+
+
+
+  "add_sub_service_subtitle": "قم بتحديد اسم وسعر الخدمة الإضافية التي ترغب بتقديمها لعملائك",
+  "sub_service_name": "اسم الخدمة",
+  "sub_service_name_hint": "مثال: فحص التمديدات",
+  "price_sar": "السعر (ر.س)",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "hour": "ساعة",
+
+
+
+
+  "edit_service": "تعديل الخدمة",
+  "change_service_image": "تغيير صورة الخدمة",
+  "service_updated_successfully": "تم حفظ التعديلات بنجاح!",
+  "save_changes": "حفظ التعديلات",
+  "currency_sar": "ر.س",
+
+
+
+
+
+  "incoming_orders": "الطلبات الواردة",
+  "all": "الكل",
+  "new_order": "جديد",
+  "in_progress": "قيد التنفيذ",
+  "completed": "مكتمل",
+  "accept": "قبول",
+  "edit": "تعديل",
+  "complete_order": "اكتمال الطلب",
+  "message": "مراسلة",
+  "currency_sar": "ر.س"
 }

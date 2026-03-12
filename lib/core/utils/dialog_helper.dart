@@ -40,4 +40,38 @@ class DialogHelper {
       },
     );
   }
+
+
+  // 🚀 دالة عرض رسالة النجاح
+  static Future<void> showSuccessDialog(BuildContext context, String message) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false, // لمنع إغلاق النافذة عند الضغط في الخارج
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Icon(Icons.check_circle_outline, color: Colors.green, size: 60),
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          Center(
+            child: SizedBox(
+              width: 120,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                onPressed: () => Navigator.pop(ctx), // إغلاق النافذة
+                child: const Text('حسناً', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -75,6 +75,44 @@
   "service_description_hint": "Explain the service details to customers, what it includes and its features...",
   "publish_service": "Publish Service",
   "fill_required_fields": "Please fill in the required fields (Name, Category, Price)",
-  "service_published_successfully": "Service published successfully!"
+  "service_published_successfully": "Service published successfully!",
+
+
+
+  
+
+
+
+  "add_sub_service_subtitle": "Specify the name and price of the additional service you want to offer to your customers",
+  "sub_service_name": "Service Name",
+  "sub_service_name_hint": "Example: Check extensions",
+  "price_sar": "Price (SAR)",
+  "save": "Save",
+  "cancel": "Cancel",
+  "hour": "Hour",
+
+
+
+  "edit_service": "Edit Service",
+  "change_service_image": "Change Service Image",
+  "service_updated_successfully": "Service updated successfully!",
+  "save_changes": "Save Changes",
+  "currency_sar": "SAR",
+
+
+
+
+
+
+  "incoming_orders": "Incoming Orders",
+  "all": "All",
+  "new_order": "New",
+  "in_progress": "In Progress",
+  "completed": "Completed",
+  "accept": "Accept",
+  "edit": "Edit",
+  "complete_order": "Complete Order",
+  "message": "Message",
+  "currency_sar": "SAR"
 
 }

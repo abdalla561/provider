@@ -1,10 +1,12 @@
 // مسار الملف: lib/features/services/repositories/manage_services_repository.dart
 
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:service_provider_app/core/network/api_client.dart';
 import 'package:service_provider_app/core/network/api_endpoints.dart';
 import 'package:service_provider_app/core/network/error/api_error_handler.dart';
 import 'package:service_provider_app/features/services/models/category_model.dart';
+import 'package:service_provider_app/features/services/models/service_details_model.dart';
 import '../../../core/storage/hive_keys.dart';
 import '../models/manage_services_model.dart';
 // أضف هذا الاستيراد في أعلى الملف لرفع الملفات
@@ -25,8 +27,18 @@ class ManageServicesRepository {
       final response = await _apiService.get(ApiEndpoints.myServices);
       final data = ApiErrorHandler.handleResponse(response);
 
-      // 2. تحويل البيانات وتخزينها في Hive لتعمل بدون إنترنت
-      final List responseList = data['data'] ?? data;
+      // // 2. تحويل البيانات وتخزينها في Hive لتعمل بدون إنترنت
+      // final List responseList = data['data'] ?? data;
+      List responseList = [];
+      if (data is List) {
+        responseList = data; // إذا كانت مصفوفة مباشرة نأخذها كما هي
+      } else if (data is Map) {
+        responseList =
+            data['data'] ??
+            data['services'] ??
+            []; // إذا كانت Map نبحث عن المفتاح
+      }
+
       await box.put(_cacheKey, responseList);
 
       // 3. إرجاع المودل
@@ -117,6 +129,98 @@ class ManageServicesRepository {
             .map((e) => CategoryModel.fromJson(Map<String, dynamic>.from(e)))
             .toList();
       }
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // 🚀 دالة جلب تفاصيل خدمة واحدة (GET /services/{id})
+  Future<ServiceDetailsModel> getServiceDetails(int id) async {
+    try {
+      final response = await _apiService.get('${ApiEndpoints.myServices}/$id');
+      final data = ApiErrorHandler.handleResponse(response);
+      // 🕵️‍♂️ سطر الطباعة السحري لاكتشاف ما يرسله الباك اند بالضبط
+      debugPrint('=========================================');
+      debugPrint('👀 بيانات تفاصيل الخدمة القادمة من السيرفر:');
+      debugPrint(data.toString());
+      debugPrint('=========================================');
+      // عادة السيرفر يرسل التفاصيل داخل 'data' أو مباشرة
+      final Map<String, dynamic> responseData = data['data'] ?? data;
+      return ServiceDetailsModel.fromJson(responseData);
+    } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // 🚀 دالة إضافة خدمة فرعية (POST /services/child)
+  Future<void> createSubService({
+    required int parentId,
+    required String name,
+    required double price,
+  }) async {
+    try {
+      final response = await _apiService.post(
+        ApiEndpoints.childServices,
+        data: {
+          "parent_service_id": parentId,
+          "name": name,
+          "price": price,
+          "description": "", // نتركه فارغاً كما طلب الباك اند (nullable)
+        },
+      );
+      ApiErrorHandler.handleResponse(response);
+    } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // 🚀 دالة حذف الخدمة (DELETE /services/{id})
+  Future<void> deleteService(int id) async {
+    try {
+      final response = await _apiService.delete(
+        '${ApiEndpoints.myServices}/$id',
+      );
+      ApiErrorHandler.handleResponse(response);
+    } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // 🚀 دالة تحديث بيانات الخدمة (POST مع خدعة _method=PUT لارافيل)
+  Future<void> updateService({
+    required int serviceId,
+    required String name,
+    required String description,
+    required double price,
+    required int categoryId,
+    File? imageFile,
+  }) async {
+    try {
+      FormData formData = FormData.fromMap({
+        "_method": "PUT", // 👈 السر هنا ليعمل التعديل مع الصور في لارافيل
+        "name": name,
+        "description": description,
+        "price": price,
+        "category_id": categoryId,
+      });
+
+      if (imageFile != null) {
+        formData.files.add(
+          MapEntry(
+            "image_path",
+            await MultipartFile.fromFile(
+              imageFile.path,
+              filename: imageFile.path.split('/').last,
+            ),
+          ),
+        );
+      }
+
+      final response = await _apiService.post(
+        '${ApiEndpoints.myServices}/$serviceId',
+        data: formData,
+      );
+      ApiErrorHandler.handleResponse(response);
+    } catch (e) {
       throw ApiErrorHandler.handle(e);
     }
   }

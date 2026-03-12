@@ -14,10 +14,11 @@ class ApiEndpoints {
   // 🎯 قم بتفعيل السطر المناسب لبيئة العمل الخاصة بك (وعطّل الباقي):
 
   /// 1. للمحاكي (Android Emulator):
-  static String get domain => "http://10.0.2.2:8000";
+  // static String get domain => "http://10.0.2.2:8000";
 
   /// 2. للهاتف الحقيقي (تأكد من وضع الـ IP الخاص بجهازك وأنك متصل بنفس الشبكة):
   // static String get domain => "http://192.168.43.245:8000";
+  static String get domain => "http://127.0.0.1:8000";
 
   /// 3. للسيرفر المرفوع على الإنترنت (Live):
   // static String get domain => "https://your-api-domain.com";
@@ -53,11 +54,16 @@ class ApiEndpoints {
   // 📂 الدوال التي تتطلب تمرير متغير (مثل الـ ID الخاص بالتصنيف)
   static String categoryDetails(int id) => "categories/$id";
 
-
   // رابط جلب وإدارة الخدمات الخاصة بمقدم الخدمة
-  static const String myServices = "services";  
-
+  static const String myServices = "services";
 
   // رابط جلب الفئات الرئيسية
   static const String mainCategories = "categories";
+
+  // رابط إضافة خدمة فرعية
+  // static const String childServices = "services/child";
+  static const String childServices = "services/children";
+
+
+  static const String getOrders = "requests"; // مسار جلب الطلبات
 }

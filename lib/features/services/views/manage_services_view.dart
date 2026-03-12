@@ -16,7 +16,7 @@ class ManageServicesView extends StatelessWidget {
     final viewModel = Provider.of<ManageServicesViewModel>(context);
     final mainViewModel = Provider.of<MainViewModel>(context, listen: false);
 
-    final filters = ['موقفة', 'نشطه', 'الكل'];
+    final filters = ['الكل', 'نشط', 'غير نشط'];
 
     return SafeArea(
       child: Column(
