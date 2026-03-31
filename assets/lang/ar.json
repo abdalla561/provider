@@ -2,7 +2,6 @@
   "welcome": "مرحباً بك  ",
   "change_theme": "تغيير الوضع (فاتح/داكن)",
   "change_language": "تغيير اللغة",
-  
   "app_name": "QuickServe",
   "welcome_title": "خدماتك اليومية، أسرع وأسهل.",
   "welcome_subtitle": "نصلك بمحترفين موثوقين في لحظات.",
@@ -12,7 +11,6 @@
   "terms_of_service": "شروط الخدمة",
   "and": " و ",
   "privacy_policy": "سياسة الخصوصية",
-
   "service_provider": "مقدم خدمة",
   "welcome_partner": "مرحباً بك، شريكنا",
   "login_subtitle": "يرجى تسجيل الدخول لإدارة خدماتك والوصول إلى لوحة التحكم",
@@ -23,8 +21,6 @@
   "forgot_password": "نسيت كلمة المرور؟",
   "or": "أو",
   "version": "الإصدار QuickServe © 2.4.0",
-
-  
   "welcome_back": "مرحباً بعودتك 👋",
   "weekly_earnings": "أرباح الأسبوع",
   "sar": "ر.س",
@@ -41,8 +37,7 @@
   "nav_services": "الخدمات",
   "nav_commissions": "العمولات",
   "nav_settings": "الإعدادات",
-
-"manage_services": "إدارة خدماتي",
+  "manage_services": "إدارة خدماتي",
   "help": "مساعدة",
   "search_service": "بحث عن خدمة...",
   "filter_all": "الكل",
@@ -54,10 +49,7 @@
   "manage_all": "إدارة الكل",
   "edit": "تعديل",
   "sub_services_count": "الخدمات الفرعية ({count})",
-
-
-  
-"add_new_service": "إضافة خدمة جديدة",
+  "add_new_service": "إضافة خدمة جديدة",
   "upload_service_image": "تحميل صورة الخدمة",
   "recommended_image_size": "يفضل مقاس 16:9 بجودة عالية",
   "service_details": "تفاصيل الخدمة",
@@ -71,9 +63,6 @@
   "publish_service": "نشر الخدمة",
   "fill_required_fields": "يرجى تعبئة الحقول الأساسية (الاسم، الفئة، السعر)",
   "service_published_successfully": "تم نشر الخدمة بنجاح!",
-
-
-"service_details": "تفاصيل الخدمة",
   "edit_data": "تعديل البيانات",
   "delete_service": "حذف الخدمة",
   "sub_services": "الخدمات الفرعية",
@@ -83,41 +72,123 @@
   "delete_confirm_msg": "هل أنت متأكد أنك تريد حذف هذه الخدمة نهائياً؟",
   "cancel": "إلغاء",
   "confirm": "تأكيد",
-
-
-
-
-
-
   "add_sub_service_subtitle": "قم بتحديد اسم وسعر الخدمة الإضافية التي ترغب بتقديمها لعملائك",
   "sub_service_name": "اسم الخدمة",
   "sub_service_name_hint": "مثال: فحص التمديدات",
   "price_sar": "السعر (ر.س)",
   "save": "حفظ",
-  "cancel": "إلغاء",
   "hour": "ساعة",
-
-
-
-
   "edit_service": "تعديل الخدمة",
   "change_service_image": "تغيير صورة الخدمة",
   "service_updated_successfully": "تم حفظ التعديلات بنجاح!",
   "save_changes": "حفظ التعديلات",
   "currency_sar": "ر.س",
-
-
-
-
-
   "incoming_orders": "الطلبات الواردة",
   "all": "الكل",
   "new_order": "جديد",
-  "in_progress": "قيد التنفيذ",
   "completed": "مكتمل",
   "accept": "قبول",
-  "edit": "تعديل",
   "complete_order": "اكتمال الطلب",
   "message": "مراسلة",
-  "currency_sar": "ر.س"
+  "commissions_management": "إدارة العمولات",
+  "verify_account_banner_title": "زد ثقتك بالناس بتوثيق حسابك",
+  "verify_account_banner_subtitle": "احصل على شارة التحقق الآن",
+  "verify_now": "وثق الآن",
+  "due_commission": "العمولة المستحقة",
+  "pay_to_avoid_suspension": "يجب سدادها لتجنب توقف الحساب",
+  "pay_now": "سداد الآن",
+  "pay_commission_subtitle": "لسداد العمولة المستحقة الموضحة أعلاه",
+  "payments_history": "سجل المدفوعات",
+  "paid": "مدفوع",
+  "pending": "معلق",
+  "archived": "مؤرشف",
+  "processing": "قيد المعالجة",
+  "pay_commissions": "دفع العمولات",
+  "total_due_commission": "إجمالي العمولة المستحقة",
+  "reward_points": "نقاط المكافآت",
+  "points": "نقطة",
+  "redeem_points_subtitle": "يمكنك استبدال نقاطك لسداد العمولات",
+  "select_payment_method": "تحديد وسيلة السداد",
+  "pay_by_receipt": "سداد بإرفاق السند",
+  "upload_bank_transfer": "رفع صورة التحويل البنكي",
+  "pay_by_points": "سداد من نقاط المكافآت",
+  "use_current_points_balance": "استخدام رصيد النقاط الحالي",
+  "submit_payment": "سداد",
+  "pay_with_points_title": "السداد بالنقاط",
+  "total_available_points": "إجمالي نقاطك المتاحة",
+  "transaction_details": "تفاصيل العملية",
+  "amount_required_to_pay": "المبلغ المطلوب سداده",
+  "equivalent_in_points": "ما يعادله من نقاط",
+  "points_deduction_notice": "سيتم خصم النقاط من رصيدك فور التأكيد",
+  "confirm_points_payment": "تأكيد السداد بالنقاط",
+  "pay_with_receipt_title": "السداد بإرفاق السند",
+  "payment_success": "تمت عملية السداد بنجاح",
+  "payment_failed": "فشلت عملية السداد، يرجى المحاولة مرة أخرى",
+  "insufficient_points": "رصيد النقاط غير كافٍ لإتمام هذه العملية",
+  "attach_payment_receipt": "إرفاق سند الدفع",
+  "receipt_upload_title": "إرفاق سند دفع العمولة",
+  "receipt_upload_subtitle": "يرجى رفع صورة واضحة لسند التحويل البنكي لضمان معالجة طلبك بسرعة",
+  "click_to_upload_receipt": "اضغط لرفع صورة السند",
+  "upload_limit_hint": "PNG, JPG (حد أقصى 5 ميجابايت)",
+  "receipt_number": "رقم السند",
+  "receipt_number_hint": "مثال: 987654321",
+  "amount": "المبلغ",
+  "notes": "الملاحظات",
+  "notes_hint": "أضف أي تفاصيل إضافية هنا...",
+  "send_receipt": "إرسال السند",
+  "secure_payment_footer": "QUICKSERVE SECURE PAYMENT",
+  "no_transactions_currently": "لا توجد عمليات حالياً",
+  "required_partial_percent": "نسبة الدفع المسبق",
+  "request_id": "رقم الطلب",
+  "request_id_hint": "أدخل رقم الطلب",
+  "bond_number": "رقم السند",
+  "bond_number_hint": "مثال: 987654321",
+  "description": "الوصف",
+  "description_hint": "أضف وصفاً أو تفاصيل إضافية هنا...",
+  "error_image_selection": "حدث خطأ أثناء اختيار الصورة",
+  "error_missing_receipt_image": "يرجى رفع صورة السند",
+  "error_missing_request_id": "يرجى إدخال رقم الطلب",
+  "error_missing_bond_number": "يرجى إدخال رقم السند",
+  "error_unexpected_fetch_data": "حدث خطأ غير متوقع أثناء جلب البيانات.",
+
+
+
+
+
+  
+  "verification_options_title": "خيارات توثيق الحساب",
+  "verification_options_subtitle": "يساعد توثيق حسابك في بناء جسر من الثقة مع عملائك وزيادة فرص اختيارك لتقديم الخدمات. الحساب الموثق يظهر بتميز في نتائج البحث.",
+  "new_verification_request": "طلب توثيق جديد",
+  "renew_current_verification": "تجديد التوثيق الحالي",
+
+
+
+  
+  "packages_title": "باقات التوثيق",
+  "quick_serve": "QuickServe",
+  "verify_account_now": "وثق حسابك الآن",
+  "verify_account_desc": "اختر الباقة المناسبة لزيادة موثوقيتك وظهورك للعملاء بشكل أكبر في المنصة",
+  "currency_rs": "ر.س",
+  "choose_package": "اختيار الباقة",
+  "why_verify": "لماذا يجب عليك التوثيق؟",
+  "increase_orders": "زيادة الطلبات",
+  "customer_trust": "ثقة العملاء",
+  "no_packages_available": "لا توجد باقات متاحة حالياً",
+  "error_loading_packages": "فشل في تحميل الباقات، يرجى المحاولة لاحقاً",
+
+
+  
+  "profile_title": "الملف الشخصي",
+  "completed_jobs": "مهمة",
+  "rating": "تقييم",
+  "years_experience": "سنوات",
+  "edit_profile": "تعديل الملف الشخصي",
+  "share_profile": "مشاركة",
+  "tab_works": "الأعمال",
+  "tab_services": "الخدمات",
+  "tab_reviews": "التقييمات",
+  "add_work_photo": "إضافة عمل"
+
+
+
 }

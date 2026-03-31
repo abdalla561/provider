@@ -6,7 +6,6 @@
 // import '../storage/hive_keys.dart';
 // import 'api_endpoints.dart';
 
-
 // /// 📂 اسم الملف: api_client.dart
 // /// 📝 الوصف: الطبقة المغلفة (Wrapper) للاتصال بالإنترنت متصلة بمعالج الأخطاء المخصص.
 
@@ -86,16 +85,14 @@ class ApiService {
 
   // 🏗️ البناء (Constructor)
   ApiService(this._tokenStorage)
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: ApiEndpoints.baseUrl,
-            connectTimeout: const Duration(seconds: 15),
-            receiveTimeout: const Duration(seconds: 15),
-            headers: {
-              'Accept': 'application/json',
-            },
-          ),
-        ) {
+    : _dio = Dio(
+        BaseOptions(
+          baseUrl: ApiEndpoints.baseUrl,
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
+          headers: {'Accept': 'application/json'},
+        ),
+      ) {
     // 🕵️ حراس الطلبات (Interceptors)
     _dio.interceptors.add(
       InterceptorsWrapper(
@@ -107,18 +104,26 @@ class ApiService {
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
             // طباعة التوكن بشكل آمن (إخفاء معظمه)
-            final displayToken = token.length > 10 ? token.substring(token.length - 10) : token;
-            developer.log('🔑 Token Attached: ...$displayToken', name: 'API_REQUEST');
+            final displayToken = token.length > 10
+                ? token.substring(token.length - 10)
+                : token;
+            developer.log(
+              '🔑 Token Attached: ...$displayToken',
+              name: 'API_REQUEST',
+            );
           }
 
           developer.log(
             '🚀 [${options.method}] ${options.uri}',
             name: 'API_REQUEST',
           );
-          
+
           // طباعة البيانات المرسلة إذا وجدت (مفيدة جداً للـ Debugging)
           if (options.data != null) {
-            developer.log('📦 Request Data: ${options.data}', name: 'API_REQUEST');
+            developer.log(
+              '📦 Request Data: ${options.data}',
+              name: 'API_REQUEST',
+            );
           }
 
           return handler.next(options);
@@ -132,9 +137,12 @@ class ApiService {
             '✅ [${response.statusCode}] Response from: ${response.requestOptions.uri}',
             name: 'API_RESPONSE',
           );
-          
+
           // طباعة محتوى الرد لمعرفة البيانات القادمة من السيرفر
-          developer.log('📄 Response Data: ${response.data}', name: 'API_RESPONSE');
+          developer.log(
+            '📄 Response Data: ${response.data}',
+            name: 'API_RESPONSE',
+          );
 
           return handler.next(response);
         },
@@ -154,13 +162,25 @@ class ApiService {
 
           // تفصيل الأخطاء الشائعة لتسهيل حلها
           if (statusCode == 401) {
-            developer.log('⚠️ [401] Unauthorized - التوكن منتهي أو غير صالح', name: 'API_ERROR');
+            developer.log(
+              '⚠️ [401] Unauthorized - التوكن منتهي أو غير صالح',
+              name: 'API_ERROR',
+            );
           } else if (statusCode == 422) {
-            developer.log('⚠️ [422] Validation Error - البيانات المرسلة غير صحيحة: $errorData', name: 'API_ERROR');
+            developer.log(
+              '⚠️ [422] Validation Error - البيانات المرسلة غير صحيحة: $errorData',
+              name: 'API_ERROR',
+            );
           } else if (statusCode == 403) {
-            developer.log('⛔ [403] Forbidden - لا تملك صلاحية لهذا الطلب: $errorData', name: 'API_ERROR');
+            developer.log(
+              '⛔ [403] Forbidden - لا تملك صلاحية لهذا الطلب: $errorData',
+              name: 'API_ERROR',
+            );
           } else if (statusCode == 500) {
-            developer.log('🔥 [500] Server Error - مشكلة في السيرفر نفسه', name: 'API_ERROR');
+            developer.log(
+              '🔥 [500] Server Error - مشكلة في السيرفر نفسه',
+              name: 'API_ERROR',
+            );
           }
 
           return handler.next(e);
@@ -174,45 +194,93 @@ class ApiService {
   // ===========================================================================
 
   /// 🔹 GET: لجلب البيانات
-  Future<Response> get(String endpoint, {Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> get(
+    String endpoint, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.get(endpoint, queryParameters: queryParameters, options: options);
+      return await _dio.get(
+        endpoint,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } catch (e) {
       rethrow;
     }
   }
 
   /// 🔹 POST: لإرسال بيانات جديدة أو رفع ملفات (عبر Options و FormData)
-  Future<Response> post(String endpoint, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> post(
+    String endpoint, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.post(endpoint, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.post(
+        endpoint,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } catch (e) {
       rethrow;
     }
   }
 
   /// 🔹 PUT: لتحديث البيانات بالكامل
-  Future<Response> put(String endpoint, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> put(
+    String endpoint, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.put(endpoint, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.put(
+        endpoint,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } catch (e) {
       rethrow;
     }
   }
 
   /// 🔹 PATCH: لتحديث جزء محدد من البيانات (مهم جداً في بعض الـ APIs)
-  Future<Response> patch(String endpoint, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> patch(
+    String endpoint, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.patch(endpoint, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.patch(
+        endpoint,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } catch (e) {
       rethrow;
     }
   }
 
   /// 🔹 DELETE: لحذف البيانات
-  Future<Response> delete(String endpoint, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+  Future<Response> delete(
+    String endpoint, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      return await _dio.delete(endpoint, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.delete(
+        endpoint,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
     } catch (e) {
       rethrow;
     }

@@ -64,6 +64,7 @@ class ManageServicesRepository {
     required String description,
     required double price,
     required int categoryId,
+    required int requiredPartialPercent,
     File? imageFile,
   }) async {
     try {
@@ -77,6 +78,7 @@ class ManageServicesRepository {
         "is_available": 1,
         "is_active": 1,
         "distance_based_price": 0,
+        "required_partial_percentage": requiredPartialPercent,
       });
 
       // إضافة الصورة إذا قام المستخدم باختيارها
@@ -192,6 +194,7 @@ class ManageServicesRepository {
     required String description,
     required double price,
     required int categoryId,
+    required int requiredPartialPercent,
     File? imageFile,
   }) async {
     try {
@@ -201,6 +204,7 @@ class ManageServicesRepository {
         "description": description,
         "price": price,
         "category_id": categoryId,
+        "required_partial_percent": requiredPartialPercent,
       });
 
       if (imageFile != null) {

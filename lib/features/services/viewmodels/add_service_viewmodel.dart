@@ -201,6 +201,7 @@ class AddServiceViewModel extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController partialPercentController = TextEditingController();
 
   // =====================================
   // 2. إدارة الفئات (Categories)
@@ -224,6 +225,8 @@ class AddServiceViewModel extends ChangeNotifier {
       nameController.text = serviceToEdit!.title;
       descriptionController.text = serviceToEdit!.description;
       priceController.text = serviceToEdit!.priceText.replaceAll(RegExp(r'[^0-9.]'), '');
+      // If serviceToEdit has a property for partialPercent, we'd use it here.
+      // But we'll leave it empty or default it if not available.
       setCategory(serviceToEdit!.categoryId);
     }
   }
@@ -269,10 +272,11 @@ class AddServiceViewModel extends ChangeNotifier {
   Future<bool> submitService(BuildContext context) async {
     if (nameController.text.trim().isEmpty ||
         priceController.text.trim().isEmpty ||
+        partialPercentController.text.trim().isEmpty ||
         _selectedCategoryId == null) {
       DialogHelper.showErrorDialog(
         context,
-        'يرجى تعبئة الحقول الأساسية (الاسم، الفئة، السعر)',
+        'يرجى تعبئة الحقول الأساسية (الاسم، الفئة، السعر، نسبة الدفع المسبق)',
       );
       return false;
     }
@@ -287,6 +291,7 @@ class AddServiceViewModel extends ChangeNotifier {
           description: descriptionController.text.trim(),
           price: double.parse(priceController.text.trim()),
           categoryId: _selectedCategoryId!,
+          requiredPartialPercent: int.parse(partialPercentController.text.trim()),
           imageFile: _imageFile,
         );
       } else {
@@ -296,6 +301,7 @@ class AddServiceViewModel extends ChangeNotifier {
           description: descriptionController.text.trim(),
           price: double.parse(priceController.text.trim()),
           categoryId: _selectedCategoryId!,
+          requiredPartialPercent: int.parse(partialPercentController.text.trim()),
           imageFile: _imageFile,
         );
       }
@@ -321,6 +327,7 @@ class AddServiceViewModel extends ChangeNotifier {
     nameController.dispose();
     priceController.dispose();
     descriptionController.dispose();
+    partialPercentController.dispose();
     super.dispose();
   }
 }

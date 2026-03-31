@@ -2,8 +2,6 @@
   "welcome": "Welcome",
   "change_theme": "Change Theme (Light/Dark)",
   "change_language": "Change Language",
-
-  
   "app_name": "QuickServe",
   "welcome_title": "Your daily services, faster and easier.",
   "welcome_subtitle": "Connecting you with reliable professionals in moments.",
@@ -13,7 +11,6 @@
   "terms_of_service": "Terms of Service",
   "and": " and ",
   "privacy_policy": "Privacy Policy",
-
   "service_provider": "Service Provider",
   "welcome_partner": "Welcome, Partner",
   "login_subtitle": "Please log in to manage your services and access the dashboard",
@@ -24,9 +21,6 @@
   "forgot_password": "Forgot password?",
   "or": "Or",
   "version": "Version QuickServe © 2.4.0",
-
-
-
   "welcome_back": "Welcome back 👋",
   "weekly_earnings": "Weekly Earnings",
   "sar": "SAR",
@@ -43,9 +37,7 @@
   "nav_services": "Services",
   "nav_commissions": "Commissions",
   "nav_settings": "Settings",
-
-
-"manage_services": "Manage Services",
+  "manage_services": "Manage Services",
   "help": "Help",
   "search_service": "Search for a service...",
   "filter_all": "All",
@@ -57,11 +49,6 @@
   "manage_all": "Manage All",
   "edit": "Edit",
   "sub_services_count": "Sub-services ({count})",
-
-
-
-
-
   "add_new_service": "Add New Service",
   "upload_service_image": "Upload Service Image",
   "recommended_image_size": "Preferred size 16:9 in high quality",
@@ -76,43 +63,116 @@
   "publish_service": "Publish Service",
   "fill_required_fields": "Please fill in the required fields (Name, Category, Price)",
   "service_published_successfully": "Service published successfully!",
-
-
-
-  
-
-
-
+  "edit_data": "Edit Data",
+  "delete_service": "Delete Service",
+  "sub_services": "Sub-services",
+  "add_sub_service": "Add Sub-service",
+  "services_count": "{count} services",
+  "delete_confirm_title": "Confirm Deletion",
+  "delete_confirm_msg": "Are you sure you want to permanently delete this service?",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
   "add_sub_service_subtitle": "Specify the name and price of the additional service you want to offer to your customers",
   "sub_service_name": "Service Name",
   "sub_service_name_hint": "Example: Check extensions",
   "price_sar": "Price (SAR)",
   "save": "Save",
-  "cancel": "Cancel",
   "hour": "Hour",
-
-
-
   "edit_service": "Edit Service",
   "change_service_image": "Change Service Image",
   "service_updated_successfully": "Service updated successfully!",
   "save_changes": "Save Changes",
   "currency_sar": "SAR",
-
-
-
-
-
-
   "incoming_orders": "Incoming Orders",
   "all": "All",
   "new_order": "New",
-  "in_progress": "In Progress",
   "completed": "Completed",
   "accept": "Accept",
-  "edit": "Edit",
   "complete_order": "Complete Order",
   "message": "Message",
-  "currency_sar": "SAR"
-
+  "commissions_management": "Commissions Management",
+  "verify_account_banner_title": "Increase your trust by verifying your account",
+  "verify_account_banner_subtitle": "Get the verification badge now",
+  "verify_now": "Verify Now",
+  "due_commission": "Due Commission",
+  "pay_to_avoid_suspension": "Must be paid to avoid account suspension",
+  "pay_now": "Pay Now",
+  "pay_commission_subtitle": "To pay the due commission shown above",
+  "payments_history": "Payments History",
+  "paid": "Paid",
+  "pending": "Pending",
+  "archived": "Archived",
+  "processing": "Processing",
+  "pay_commissions": "Pay Commissions",
+  "total_due_commission": "Total Due Commission",
+  "reward_points": "Reward Points",
+  "points": "Points",
+  "redeem_points_subtitle": "You can redeem your points to pay commissions",
+  "select_payment_method": "Select Payment Method",
+  "pay_by_receipt": "Pay by Attaching Receipt",
+  "upload_bank_transfer": "Upload Bank Transfer Image",
+  "pay_by_points": "Pay from Reward Points",
+  "use_current_points_balance": "Use Current Points Balance",
+  "submit_payment": "Pay",
+  "pay_with_points_title": "Pay with Points",
+  "total_available_points": "Total available points",
+  "transaction_details": "Transaction Details",
+  "amount_required_to_pay": "Amount required to pay",
+  "equivalent_in_points": "Equivalent in points",
+  "points_deduction_notice": "Points will be deducted from your balance upon confirmation",
+  "confirm_points_payment": "Confirm Payment with Points",
+  "pay_with_receipt_title": "Pay by Attaching Receipt",
+  "payment_success": "Payment completed successfully",
+  "payment_failed": "Payment failed, please try again",
+  "insufficient_points": "Insufficient points balance to complete this transaction",
+  "attach_payment_receipt": "Attach Payment Receipt",
+  "receipt_upload_title": "Commission Payment Receipt Attachment",
+  "receipt_upload_subtitle": "Please upload a clear photo of the bank transfer receipt to ensure fast processing",
+  "click_to_upload_receipt": "Click to upload receipt photo",
+  "upload_limit_hint": "PNG, JPG (Max 5MB)",
+  "receipt_number": "Receipt Number",
+  "receipt_number_hint": "Example: 987654321",
+  "amount": "Amount",
+  "notes": "Notes",
+  "notes_hint": "Add any additional details here...",
+  "send_receipt": "Send Receipt",
+  "secure_payment_footer": "QUICKSERVE SECURE PAYMENT",
+  "no_transactions_currently": "No transactions currently",
+  "required_partial_percent": "Prepayment Percentage",
+  "request_id": "Request ID",
+  "request_id_hint": "Enter request ID",
+  "bond_number": "Bond Number",
+  "bond_number_hint": "Example: 987654321",
+  "description": "Description",
+  "description_hint": "Add a description or additional details here...",
+  "error_image_selection": "An error occurred while selecting the image",
+  "error_missing_receipt_image": "Please upload the receipt image",
+  "error_missing_request_id": "Please enter the request ID",
+  "error_missing_bond_number": "Please enter the bond number",
+  "error_unexpected_fetch_data": "An unexpected error occurred while fetching data.",
+  "verification_options_title": "Account Verification Options",
+  "verification_options_subtitle": "Verifying your account helps build trust with your clients and increases your chances of being selected. A verified account stands out in search results.",
+  "new_verification_request": "New Verification Request",
+  "renew_current_verification": "Renew Current Verification",
+  "packages_title": "Verification Packages",
+  "quick_serve": "QuickServe",
+  "verify_account_now": "Verify Your Account Now",
+  "verify_account_desc": "Choose the right package to increase your reliability and visibility to customers on the platform",
+  "currency_rs": "SAR",
+  "choose_package": "Choose Package",
+  "why_verify": "Why should you verify?",
+  "increase_orders": "Increase Orders",
+  "customer_trust": "Customer Trust",
+  "no_packages_available": "No packages available at the moment",
+  "error_loading_packages": "Failed to load packages, please try again later",
+  "profile_title": "Profile",
+  "completed_jobs": "Jobs",
+  "rating": "Rating",
+  "years_experience": "Years",
+  "edit_profile": "Edit Profile",
+  "share_profile": "Share",
+  "tab_works": "Works",
+  "tab_services": "Services",
+  "tab_reviews": "Reviews",
+  "add_work_photo": "Add Photo"
 }

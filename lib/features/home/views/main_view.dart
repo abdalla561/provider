@@ -2,7 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:service_provider_app/features/commissions/views/commissions_view.dart';
 import 'package:service_provider_app/features/home/views/home_dashboard_view.dart';
+import 'package:service_provider_app/features/orders/Views/orders_view.dart';
+import 'package:service_provider_app/features/profile/views/profile_view.dart';
 import 'package:service_provider_app/features/services/views/manage_services_view.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/qs_color_extension.dart';
@@ -30,10 +33,10 @@ class _MainViewBody extends StatelessWidget {
     // قائمة الشاشات (حالياً الرئيسية فقط، والباقي شاشات فارغة مؤقتاً)
     final List<Widget> screens = [
       const HomeDashboardView(),
-      const Center(child: Text('شاشة الطلبات')),
+      const OrdersView(),
       const ManageServicesView(),
-      const Center(child: Text('شاشة العمولات')),
-      const Center(child: Text('شاشة الإعدادات')),
+      const CommissionsView(),
+      const ProfileView(),
     ];
 
     return Scaffold(
@@ -85,8 +88,8 @@ class _MainViewBody extends StatelessWidget {
               label: context.tr('nav_commissions'),
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.settings_outlined),
-              label: context.tr('nav_settings'),
+              icon: const Icon(Icons.person),
+              label: context.tr('nav_profile'),
             ),
           ],
         ),

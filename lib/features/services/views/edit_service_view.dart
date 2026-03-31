@@ -177,6 +177,10 @@ class _EditServiceBody extends StatelessWidget {
             _buildPriceField(context, viewModel.priceController),
             const SizedBox(height: 16),
 
+            _buildLabel(context, context.tr('required_partial_percent')),
+            _buildPercentField(context, viewModel.partialPercentController),
+            const SizedBox(height: 16),
+
             _buildLabel(context, context.tr('service_description')),
             _buildTextField(
               context,
@@ -377,6 +381,54 @@ class _EditServiceBody extends StatelessWidget {
             ),
             child: Text(
               context.tr('currency_sar') ?? 'ر.س',
+              style: TextStyle(
+                color: context.qsColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPercentField(
+    BuildContext context,
+    TextEditingController controller,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.qsColors.textSub.withOpacity(0.1)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: '40',
+                hintStyle: TextStyle(
+                  color: context.qsColors.textSub.withOpacity(0.5),
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: context.qsColors.textSub.withOpacity(0.1),
+                ),
+              ),
+            ),
+            child: Text(
+              '%',
               style: TextStyle(
                 color: context.qsColors.primary,
                 fontWeight: FontWeight.bold,

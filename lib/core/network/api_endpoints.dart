@@ -64,6 +64,29 @@ class ApiEndpoints {
   // static const String childServices = "services/child";
   static const String childServices = "services/children";
 
-
   static const String getOrders = "requests"; // مسار جلب الطلبات
+
+  // رابط العمولات
+  static const String commissions = "commissions";
+
+  // رابط تقديم سند دفع العمولة عبر إيصال
+  static const String requestCommissionBonds = "request-commission-bonds";
+
+  // ===========================================================================
+  // 💰 Withdrawals & Points Packages (السحوبات وباقات النقاط)
+  // ===========================================================================
+
+  // 📥 طلب سحب الأرباح
+  static const String withdrawRequest = '/withdraw-request';
+
+  // 🚀 شراء باقة نقاط (توثيق)
+  static const String subscribePointsPackage = '/subscribe-points-package';
+
+  // 📦 جلب باقات النقاط المتاحة
+  // static const String availablePointsPackages = '/user-verification-packages';
+  static const String availablePointsPackages = '/available-points-packages';
+
+  static const String userVerificationPackages = '/user-verification-packages';
+
+  static const String myProfile = "provider/profile";
 }

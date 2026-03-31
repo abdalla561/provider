@@ -21,6 +21,7 @@ class EditServiceViewModel extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController partialPercentController = TextEditingController();
 
   int? _selectedCategoryId;
   int? get selectedCategoryId => _selectedCategoryId;
@@ -42,6 +43,7 @@ class EditServiceViewModel extends ChangeNotifier {
     descriptionController.text = service.description;
     // priceController.text = service.priceText.replaceAll(RegExp(r'[^0-9.]'), '');
     priceController.text = service.priceText.split(' ').first;
+    partialPercentController.text = '40'; // افتراضيا 40 إلا لو أضفناها لـ ServiceDetailsModel
     _selectedCategoryId = service.categoryId;
   }
 
@@ -76,6 +78,7 @@ class EditServiceViewModel extends ChangeNotifier {
   Future<bool> updateService(BuildContext context) async {
     if (nameController.text.trim().isEmpty ||
         priceController.text.trim().isEmpty ||
+        partialPercentController.text.trim().isEmpty ||
         _selectedCategoryId == null) {
       DialogHelper.showErrorDialog(context, 'يرجى تعبئة الحقول الأساسية');
       return false;
@@ -91,6 +94,7 @@ class EditServiceViewModel extends ChangeNotifier {
         description: descriptionController.text.trim(),
         price: double.parse(priceController.text.trim()),
         categoryId: _selectedCategoryId!,
+        requiredPartialPercent: int.parse(partialPercentController.text.trim()),
         imageFile: _imageFile,
       );
 
@@ -121,6 +125,7 @@ class EditServiceViewModel extends ChangeNotifier {
     nameController.dispose();
     priceController.dispose();
     descriptionController.dispose();
+    partialPercentController.dispose();
     super.dispose();
   }
 }

@@ -1,0 +1,222 @@
+// مسار الملف: lib/features/commissions/views/pay_commissions_view.dart
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../core/localization/app_localizations.dart';
+import '../../../core/theme/qs_color_extension.dart';
+import '../viewmodels/pay_commissions_viewmodel.dart';
+import 'widgets/reward_points_card.dart';
+import 'widgets/payment_method_option_widget.dart';
+import 'widgets/total_due_commission_card.dart';
+import 'pay_with_points_view.dart';
+import 'pay_with_receipt_view.dart';
+
+class PayCommissionsView extends StatefulWidget {
+  final double amount;
+
+  const PayCommissionsView({super.key, required this.amount});
+
+  @override
+  State<PayCommissionsView> createState() => _PayCommissionsViewState();
+}
+
+class _PayCommissionsViewState extends State<PayCommissionsView> {
+  @override
+  void initState() {
+    super.initState();
+    // جلب البيانات فور تحميل الصفحة
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<PayCommissionsViewModel>().fetchCommissionsData();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = Provider.of<PayCommissionsViewModel>(context);
+    final Color bgColor = const Color(0xFFF8F9FA);
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          context.tr('pay_commissions'),
+          style: TextStyle(
+            color: context.qsColors.text,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.arrow_forward_ios, color: context.qsColors.text),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+        leading: const SizedBox.shrink(),
+      ),
+      body: viewModel.isLoading && viewModel.commissionData == null
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 10,
+                    bottom: 100,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // 1. بطاقة إجمالي العمولة المستحقة
+                      TotalDueCommissionCard(amount: widget.amount),
+                      const SizedBox(height: 16),
+
+                      // 2. بطاقة نقاط المكافآت (الديناميكية)
+                      RewardPointsCard(
+                        pointsBalance:
+                            viewModel.commissionData?.summary.availablePoints ??
+                            0,
+                      ),
+                      const SizedBox(height: 32),
+
+                      // 3. قسم تحديد وسيلة السداد
+                      Text(
+                        context.tr('select_payment_method'),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                      const SizedBox(height: 16),
+
+                      PaymentMethodOptionWidget(
+                        title: context.tr('pay_by_receipt'),
+                        subtitle: context.tr('upload_bank_transfer'),
+                        iconData: Icons.attach_file_rounded,
+                        iconColor: Colors.blueGrey,
+                        isSelected:
+                            viewModel.selectedMethod ==
+                            PaymentMethodType.bankTransfer,
+                        onTap: () => viewModel.changePaymentMethod(
+                          PaymentMethodType.bankTransfer,
+                        ),
+                      ),
+                      PaymentMethodOptionWidget(
+                        title: context.tr('pay_by_points'),
+                        subtitle: context.tr('use_current_points_balance'),
+                        iconData: Icons.card_giftcard_rounded,
+                        iconColor: const Color(0xFFE68A00),
+                        isSelected:
+                            viewModel.selectedMethod ==
+                            PaymentMethodType.rewardPoints,
+                        onTap: () => viewModel.changePaymentMethod(
+                          PaymentMethodType.rewardPoints,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  left: 20,
+                  right: 20,
+                  bottom: 24,
+                  child: SizedBox(
+                    height: 55,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (viewModel.selectedMethod ==
+                            PaymentMethodType.rewardPoints) {
+                          // إزالة شرط الإيقاف في حال كانت البيانات null للاستمرار في عرض الصفحة
+                          // استخدام قيم افتراضية إذا لم ينجح الـ API في جلب البيانات
+                          final summary = viewModel.commissionData?.summary;
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PayWithPointsView(
+                                amount: widget.amount,
+                                availablePoints: summary?.availablePoints ?? 0,
+                                equivalentPoints:
+                                    (widget.amount *
+                                            (summary?.pointsConversionFactor ??
+                                                100))
+                                        .toInt(),
+                              ),
+                            ),
+                          );
+                        } else if (viewModel.selectedMethod ==
+                            PaymentMethodType.bankTransfer) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PayWithReceiptView(),
+                            ),
+                          );
+                        }
+                      },
+                      // onPressed: () {
+                      //   if (viewModel.selectedMethod ==
+                      //       PaymentMethodType.rewardPoints) {
+                      //     // التأكد من وجود البيانات قبل الانتقال
+                      //     final summary = viewModel.commissionData?.summary;
+                      //     if (summary != null) {
+                      //       Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //           builder: (_) => PayWithPointsView(
+                      //             amount: widget.amount,
+                      //             availablePoints: summary.availablePoints,
+                      //             equivalentPoints:
+                      //                 (widget.amount *
+                      //                         summary.pointsConversionFactor)
+                      //                     .toInt(),
+                      //           ),
+                      //         ),
+                      //       );
+                      //     }
+                      //   } else if (viewModel.selectedMethod ==
+                      //       PaymentMethodType.bankTransfer) {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (_) => const PayWithReceiptView(),
+                      //       ),
+                      //     );
+                      //   }
+                      // },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF5CA4B8),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            context.tr('submit_payment'),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.payments_outlined, size: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}

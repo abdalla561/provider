@@ -66,7 +66,9 @@ class ServiceModel {
   final String priceText;
   final String status;
   final String imageUrl;
+
   final int subServicesCount;
+
   final bool isExpanded;
   final List<SubServiceModel> quickServices;
 
