@@ -66,14 +66,19 @@ class _AddServiceBody extends StatelessWidget {
                 width: double.infinity,
                 height: 180,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
-                  // استخدام حدود عادية (يمكن استبدالها لاحقاً بمكتبة dotted_border)
                   border: Border.all(
-                    color: context.qsColors.textSub.withOpacity(0.3),
-                    width: 2,
-                    style: BorderStyle.solid,
+                    color: context.qsColors.textSub.withOpacity(0.15),
+                    width: 1,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                   image: viewModel.imageFile != null
                       ? DecorationImage(
                           image: FileImage(viewModel.imageFile!),
@@ -169,6 +174,18 @@ class _AddServiceBody extends StatelessWidget {
               hint: context.tr('service_description_hint'),
               maxLines: 4,
             ),
+            const SizedBox(height: 16),
+
+            // ==========================================
+            // 3.1. تسعير المسافة
+            // ==========================================
+            _buildDistancePricingSection(context, viewModel),
+            const SizedBox(height: 24),
+
+            // ==========================================
+            // 3.2. جدولة الخدمة
+            // ==========================================
+            _buildScheduleSection(context, viewModel),
 
             const SizedBox(height: 40),
 
@@ -415,6 +432,199 @@ class _AddServiceBody extends StatelessWidget {
                 color: context.qsColors.primary,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDistancePricingSection(
+    BuildContext context,
+    AddServiceViewModel viewModel,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildLabel(context, context.tr('distance_based_price')),
+            Switch.adaptive(
+              value: viewModel.distanceBasedPrice,
+              onChanged: viewModel.setDistanceBasedPrice,
+              activeColor: context.qsColors.primary,
+            ),
+          ],
+        ),
+        if (viewModel.distanceBasedPrice) ...[
+          const SizedBox(height: 8),
+          _buildLabel(context, context.tr('price_per_km')),
+          _buildPriceField(context, viewModel.pricePerKmController),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildScheduleSection(
+    BuildContext context,
+    AddServiceViewModel viewModel,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 20,
+              decoration: BoxDecoration(
+                color: context.qsColors.primary,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              context.tr('service_schedule'),
+              style: TextStyle(
+                color: context.qsColors.text,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: viewModel.schedules.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final schedule = viewModel.schedules[index];
+            return Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: context.qsColors.textSub.withOpacity(0.1),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        context.tr(schedule.days.isNotEmpty ? schedule.days.first.toLowerCase() : ''),
+                        style: TextStyle(
+                          color: context.qsColors.text,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Switch.adaptive(
+                        value: schedule.isActive,
+                        onChanged: (_) => viewModel.toggleDay(index),
+                        activeColor: context.qsColors.primary,
+                      ),
+                    ],
+                  ),
+                  if (schedule.isActive) ...[
+                    const Divider(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildTimePicker(
+                            context,
+                            label: context.tr('start_time'),
+                            time: schedule.startTime,
+                            onTap: () async {
+                              final picked = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+                              if (picked != null) {
+                                viewModel.updateStartTime(
+                                  index,
+                                  "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}",
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildTimePicker(
+                            context,
+                            label: context.tr('end_time'),
+                            time: schedule.endTime,
+                            onTap: () async {
+                              final picked = await showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              );
+                              if (picked != null) {
+                                viewModel.updateEndTime(
+                                  index,
+                                  "${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}",
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimePicker(
+    BuildContext context, {
+    required String label,
+    required String time,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: context.qsColors.textSub, fontSize: 12),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: context.qsColors.textSub.withOpacity(0.1),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  time,
+                  style: TextStyle(
+                    color: context.qsColors.text,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Icon(
+                  Icons.access_time,
+                  size: 16,
+                  color: context.qsColors.primary,
+                ),
+              ],
             ),
           ),
         ],

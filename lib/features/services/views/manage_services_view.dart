@@ -7,6 +7,7 @@ import 'package:service_provider_app/features/services/widgets/service_card_widg
 import '../../../core/theme/qs_color_extension.dart';
 import '../../home/viewmodels/main_viewmodel.dart';
 import '../viewmodels/manage_services_viewmodel.dart';
+import 'special_services_view.dart' as service_views;
 
 class ManageServicesView extends StatelessWidget {
   const ManageServicesView({super.key});
@@ -25,24 +26,8 @@ class ManageServicesView extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => AddServiceView()),
-                    );
-                  },
-                  child: Text(
-                    'اضافة خدمة',
-                    style: TextStyle(
-                      color: context.qsColors.primary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
                 Text(
                   'إدارة خدماتي',
                   style: TextStyle(
@@ -51,11 +36,6 @@ class ManageServicesView extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                // IconButton(
-                //   onPressed: () => mainViewModel.changeTab(0), // يعود للرئيسية
-                //   icon: Icon(Icons.arrow_forward, color: context.qsColors.text),
-                // ),
-                SizedBox(width: 0),
               ],
             ),
           ),
@@ -72,7 +52,7 @@ class ManageServicesView extends StatelessWidget {
                     // 2. شريط البحث
                     Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
@@ -100,6 +80,96 @@ class ManageServicesView extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+
+                    // أزرار إضافة خدمة + الخدمات المخصصة والحضور
+                    Row(
+                      children: [
+                        // زر إضافة خدمة
+                        Expanded(
+                          flex: 1,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => AddServiceView()),
+                              );
+                            },
+                            child: Container(
+                              height: 55,
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              decoration: BoxDecoration(
+                                color: context.qsColors.primary,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.add, color: Colors.white, size: 18),
+                                  const SizedBox(width: 2),
+                                  const Flexible(
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        'إضافة خدمة',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // زر الخدمات المخصصة والحضور
+                        Expanded(
+                          flex: 2,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const service_views.SpecialServicesView()),
+                              );
+                            },
+                            child: Container(
+                              height: 55,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: context.qsColors.primary.withOpacity(0.05),
+                                border: Border.all(color: context.qsColors.primary.withOpacity(0.3)),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.workspace_premium, color: context.qsColors.primary, size: 18),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      'الخدمات المخصصة والحضور',
+                                      style: TextStyle(
+                                        color: context.qsColors.primary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 20),
 
                     // 3. أزرار الفلترة
@@ -120,8 +190,9 @@ class ManageServicesView extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? context.qsColors.text
-                                    : Theme.of(context).cardColor,
+                                    ? context.qsColors.primary
+                                    // ? context.qsColors.text
+                                    : Colors.white,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: isSelected
@@ -135,7 +206,7 @@ class ManageServicesView extends StatelessWidget {
                                 filters[index],
                                 style: TextStyle(
                                   color: isSelected
-                                      ? Theme.of(context).cardColor
+                                      ? Colors.white
                                       : context.qsColors.textSub,
                                   fontWeight: isSelected
                                       ? FontWeight.bold

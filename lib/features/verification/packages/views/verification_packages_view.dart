@@ -162,14 +162,14 @@ class VerificationPackagesView extends StatelessWidget {
   }
 
   Widget _buildPackageCard(BuildContext context, PackageModel package, dynamic colors) {
-    // 🎨 تحديد الألوان بناءً على نوع الباقة (isPopular تحدد اللون الأزرق)
-    final bool isBlue = package.isPopular;
+    // 🎨 توحيد الألوان لتكون بيضاء (White Theme) لجميع الكروت
+    final bool isBlue = package.isPopular; // نحتفظ بها لتمييز "الأكثر طلباً" فقط في الشارة
     
-    final Color cardColor = isBlue ? const Color(0xFF5CA4B8) : Theme.of(context).cardColor;
-    final Color textColor = isBlue ? Colors.white : colors.text;
-    final Color subTextColor = isBlue ? Colors.white70 : colors.textSub;
-    final Color buttonColor = isBlue ? Colors.white : const Color(0xFFF3F4F6);
-    final Color buttonTextColor = isBlue ? const Color(0xFF5CA4B8) : colors.text;
+    final Color cardColor = Colors.white;
+    final Color textColor = colors.text;
+    final Color subTextColor = colors.textSub;
+    final Color buttonColor = isBlue ? const Color(0xFF5CA4B8) : const Color(0xFFF3F4F6);
+    final Color buttonTextColor = isBlue ? Colors.white : colors.text;
     
     // تحديد الأيقونات العلوية ديناميكياً (نجمة برونزية، أو وسام أزرق، أو كأس ذهبي)
     IconData topIcon = Icons.star_rounded;
@@ -218,7 +218,7 @@ class VerificationPackagesView extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
-                      color: isBlue ? Colors.white : const Color(0xFFFFF3E0),
+                      color: isBlue ? const Color(0xFF5CA4B8).withOpacity(0.1) : const Color(0xFFFFF3E0),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -236,10 +236,10 @@ class VerificationPackagesView extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: topIconBg,
+                    color: isBlue ? const Color(0xFF5CA4B8).withOpacity(0.1) : topIconBg,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(topIcon, color: topIconColor, size: 22),
+                  child: Icon(topIcon, color: isBlue ? const Color(0xFF5CA4B8) : topIconColor, size: 22),
                 ),
               ],
             ),

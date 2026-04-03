@@ -1,6 +1,11 @@
 // مسار الملف: lib/features/packages/viewmodels/packages_viewmodel.dart
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/network/api_client.dart';
+import '../../submit_verification/repositories/verification_repository.dart';
+import '../../submit_verification/viewmodels/verification_viewmodel.dart';
+import '../../submit_verification/views/submit_verification_view.dart';
 import '../models/package_model.dart';
 import '../repositories/packages_repository.dart'; // 🚀 مسحنا كلمة hide من هنا
 
@@ -33,8 +38,19 @@ class PackagesViewModel extends ChangeNotifier {
     }
   }
 
-  // 🚀 عند اختيار الباقة 
+  // 🚀 عند اختيار الباقة والانتقال لشاشة إرسال البيانات
   void selectPackage(BuildContext context, int packageId) {
-    print('تم اختيار الباقة من السيرفر رقم: $packageId');
+    // الانتقال لشاشة إرسال التوثيق مع حقن الـ ViewModel والـ Repository الخاص بها
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          create: (context) => VerificationViewModel(
+            VerificationRepository(context.read<ApiService>()),
+          ),
+          child: SubmitVerificationView(packageId: packageId),
+        ),
+      ),
+    );
   }
 }

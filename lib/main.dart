@@ -4,12 +4,19 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:service_provider_app/core/network/api_client.dart';
 import 'package:service_provider_app/features/services/repositories/manage_services_repository.dart';
 import 'package:service_provider_app/features/services/viewmodels/manage_services_viewmodel.dart';
-import 'package:service_provider_app/features/commissions/repositories/commissions_repository.dart';
-import 'package:service_provider_app/features/commissions/viewmodels/commissions_viewmodel.dart';
-import 'package:service_provider_app/features/commissions/viewmodels/pay_commissions_viewmodel.dart';
-import 'package:service_provider_app/features/commissions/viewmodels/pay_with_points_viewmodel.dart';
-import 'package:service_provider_app/features/profile/repositories/profile_repository.dart';
-import 'package:service_provider_app/features/profile/viewmodels/profile_viewmodel.dart';
+import 'features/commissions/repositories/commissions_repository.dart';
+import 'features/commissions/repositories/payments_history_repository.dart';
+import 'features/commissions/viewmodels/commissions_viewmodel.dart';
+import 'features/commissions/viewmodels/commissions_stats_viewmodel.dart';
+import 'features/commissions/viewmodels/payments_history_viewmodel.dart';
+import 'features/commissions/viewmodels/pay_commissions_viewmodel.dart';
+import 'features/commissions/viewmodels/pay_with_points_viewmodel.dart';
+import 'features/profile/repositories/profile_repository.dart';
+import 'features/profile/viewmodels/profile_viewmodel.dart';
+import 'package:service_provider_app/features/withdraw/repositories/withdraw_repository.dart';
+import 'package:service_provider_app/features/withdraw/viewmodels/withdraw_viewmodel.dart';
+import 'package:service_provider_app/features/points/repositories/points_repository.dart';
+import 'package:service_provider_app/features/points/viewmodels/convert_points_viewmodel.dart';
 // 1. استدعاء ملفات الشبكة والتخزين (التي نسيناها) 🌐
 import 'core/storage/token_storage.dart';
 import 'features/home/repositories/home_repository.dart';
@@ -39,7 +46,10 @@ void main() async {
   final homeRepository = HomeRepository(apiService);
   final manageServicesRepository = ManageServicesRepository(apiService);
   final commissionsRepository = CommissionsRepository(apiService);
+  final paymentsHistoryRepository = PaymentsHistoryRepository(apiService);
   final profileRepository = ProfileRepository(apiService);
+  final withdrawRepository = WithdrawRepository(apiService);
+  final pointsRepository = PointsRepository(apiService);
 
   runApp(
     MultiProvider(
@@ -47,6 +57,9 @@ void main() async {
         // 💉 حقن الخدمات الأساسية لتكون متاحة عبر context
         Provider<TokenStorage>.value(value: tokenStorage),
         Provider<ApiService>.value(value: apiService),
+        Provider<PointsRepository>.value(value: pointsRepository),
+        Provider<ProfileRepository>.value(value: profileRepository),
+        Provider<PaymentsHistoryRepository>.value(value: paymentsHistoryRepository),
 
         // ⚙️ 👇 التعديل هنا: أضفنا SettingsProvider لكي لا يتعطل التطبيق!
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
@@ -61,12 +74,30 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ManageServicesViewModel(manageServicesRepository)),
 
         // العمولات
-        ChangeNotifierProvider(create: (_) => CommissionsViewModel(commissionsRepository)),
+        ChangeNotifierProvider(
+          create: (_) => CommissionsViewModel(commissionsRepository),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CommissionsStatsViewModel(
+            commissionsRepository,
+            pointsRepository,
+            profileRepository,
+          ),
+        ),
         ChangeNotifierProvider(create: (_) => PayCommissionsViewModel(commissionsRepository)),
         ChangeNotifierProvider(create: (_) => PayWithPointsViewModel(commissionsRepository)),
 
         // 🔥 الملف الشخصي
         ChangeNotifierProvider(create: (_) => ProfileViewModel(profileRepository)),
+        
+        // 💰 سحب الأرباح
+        ChangeNotifierProvider(create: (_) => WithdrawViewModel(withdrawRepository)),
+
+        // 📊 سجل المدفوعات والعمليات المطور
+        ChangeNotifierProvider(create: (_) => PaymentsHistoryViewModel(paymentsHistoryRepository)),
+
+        // 🔄 تحويل الأرباح لنقاط
+        ChangeNotifierProvider(create: (_) => ConvertPointsViewModel(pointsRepository)),
       ],
       child: const MyApp(),
     ),

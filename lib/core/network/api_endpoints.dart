@@ -77,16 +77,23 @@ class ApiEndpoints {
   // ===========================================================================
 
   // 📥 طلب سحب الأرباح
-  static const String withdrawRequest = '/withdraw-request';
+  static const String withdrawRequest = 'withdraw-request';
 
-  // 🚀 شراء باقة نقاط (توثيق)
-  static const String subscribePointsPackage = '/subscribe-points-package';
+  // 🚀 شراء باقة نقاط
+  static const String subscribePointsPackage = 'subscribe-points-package';
 
   // 📦 جلب باقات النقاط المتاحة
-  // static const String availablePointsPackages = '/user-verification-packages';
-  static const String availablePointsPackages = '/available-points-packages';
+  static const String availablePointsPackages = 'verification-packages';
+  static const String getPointsPackages = 'available-points-packages';
+  static const String userVerificationPackages = 'user-verification-packages';
+  static const String verificationRequests = "verification-requests";
 
-  static const String userVerificationPackages = '/user-verification-packages';
-
-  static const String myProfile = "provider/profile";
+  static const String myProfile = "my-profile";
+  static const String providerCommissionSummary = "provider-commission-summary";
+  static const String pointsBalance = "points/balance";
+  static const String pointTransactions = "points/transactions";
+  static const String myWithdrawRequests = "my-withdraw-requests";
+  static const String providerRequestBonds = "provider-request-bonds";
+  static const String myPointsPackages = "my-points-packages";
+  static const String convertPoints = "points/convert";
 }

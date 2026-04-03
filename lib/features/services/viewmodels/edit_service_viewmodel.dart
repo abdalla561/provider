@@ -8,12 +8,14 @@ import 'package:service_provider_app/core/utils/dialog_helper.dart';
 import 'package:service_provider_app/features/services/models/service_details_model.dart';
 import '../repositories/manage_services_repository.dart';
 import '../models/category_model.dart';
+import '../models/service_schedule_model.dart';
 
 class EditServiceViewModel extends ChangeNotifier {
   final ManageServicesRepository _repository;
   final ServiceDetailsModel service;
 
   EditServiceViewModel(this._repository, this.service) {
+    _initSchedules();
     _initData();
     fetchCategories();
   }
@@ -22,6 +24,7 @@ class EditServiceViewModel extends ChangeNotifier {
   final TextEditingController priceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController partialPercentController = TextEditingController();
+  final TextEditingController pricePerKmController = TextEditingController();
 
   int? _selectedCategoryId;
   int? get selectedCategoryId => _selectedCategoryId;
@@ -37,15 +40,60 @@ class EditServiceViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _distanceBasedPrice = false;
+  bool get distanceBasedPrice => _distanceBasedPrice;
+
+  bool _isActive = true;
+  bool get isActive => _isActive;
+
+  List<ServiceScheduleModel> _schedules = [];
+  List<ServiceScheduleModel> get schedules => _schedules;
+
+  void _initSchedules() {
+    _schedules = [
+      ServiceScheduleModel(
+        days: [
+          'Saturday',
+          'Sunday',
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday'
+        ],
+        startTime: "08:00",
+        endTime: "22:00",
+        isActive: true,
+      )
+    ];
+  }
+
   // 🚀 تعبئة الحقول ببيانات الخدمة الحالية
   void _initData() {
     nameController.text = service.title;
     descriptionController.text = service.description;
-    // priceController.text = service.priceText.replaceAll(RegExp(r'[^0-9.]'), '');
     priceController.text = service.priceText.split(' ').first;
-    partialPercentController.text = '40'; // افتراضيا 40 إلا لو أضفناها لـ ServiceDetailsModel
+    partialPercentController.text = service.requiredPartialPercentage.toString();
+    _distanceBasedPrice = service.distanceBasedPrice;
+    pricePerKmController.text = service.pricePerKm.toString();
     _selectedCategoryId = service.categoryId;
+    _isActive = service.isActive;
+
+    if (service.schedules.isNotEmpty) {
+      _schedules = List.from(service.schedules);
+    }
   }
+
+  void setDistanceBasedPrice(bool value) {
+    _distanceBasedPrice = value;
+    notifyListeners();
+  }
+
+  void setIsActive(bool value) {
+    _isActive = value;
+    notifyListeners();
+  }
+
 
   void setCategory(int? id) {
     _selectedCategoryId = id;
@@ -57,6 +105,11 @@ class EditServiceViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       _categories = await _repository.getMainCategories();
+      // تحقق: في حالة تعديل خدمة ليس لها تصنيف ضمن القائمة (مثلاً 0 للخدمات المخصصة)
+      if (_selectedCategoryId != null && 
+          !_categories.any((c) => c.id == _selectedCategoryId)) {
+        _selectedCategoryId = null;
+      }
     } catch (e) {
       debugPrint('Error fetching categories: $e');
     } finally {
@@ -74,7 +127,6 @@ class EditServiceViewModel extends ChangeNotifier {
     }
   }
 
-  // 🚀 دالة الإرسال (تقوم بالتعديل فقط PUT)
   Future<bool> updateService(BuildContext context) async {
     if (nameController.text.trim().isEmpty ||
         priceController.text.trim().isEmpty ||
@@ -95,6 +147,9 @@ class EditServiceViewModel extends ChangeNotifier {
         price: double.parse(priceController.text.trim()),
         categoryId: _selectedCategoryId!,
         requiredPartialPercent: int.parse(partialPercentController.text.trim()),
+        isActive: _isActive,
+        distanceBasedPrice: _distanceBasedPrice,
+        pricePerKm: _distanceBasedPrice ? double.tryParse(pricePerKmController.text.trim()) ?? 0.0 : 0.0,
         imageFile: _imageFile,
       );
 
@@ -113,7 +168,6 @@ class EditServiceViewModel extends ChangeNotifier {
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      // 🚀 سطر الطباعة 2 لمعرفة أخطاء الكود
       debugPrint('❌ خطأ برمجي في فلاتر: $e');
       DialogHelper.showErrorDialog(context, 'حدث خطأ أثناء التعديل');
       return false;
@@ -126,6 +180,7 @@ class EditServiceViewModel extends ChangeNotifier {
     priceController.dispose();
     descriptionController.dispose();
     partialPercentController.dispose();
+    pricePerKmController.dispose();
     super.dispose();
   }
 }

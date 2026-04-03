@@ -160,6 +160,14 @@ class ApiService {
             error: e.message,
           );
 
+          // 📄 طباعة كامل بيانات الرد من السيرفر لمعرفة الخطأ الحقيقي (مثلاً: حقل مفقود)
+          if (errorData != null) {
+            developer.log(
+              '📄 Error Response Data: $errorData',
+              name: 'API_ERROR',
+            );
+          }
+
           // تفصيل الأخطاء الشائعة لتسهيل حلها
           if (statusCode == 401) {
             developer.log(

@@ -445,7 +445,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:service_provider_app/core/network/api_client.dart';
-import 'package:service_provider_app/features/services/views/add_service_view.dart';
+import 'package:service_provider_app/features/services/viewmodels/service_details_viewmodel.dart';
+import 'package:service_provider_app/features/services/viewmodels/service_schedule_viewmodel.dart';
+import 'package:service_provider_app/features/services/models/service_schedule_model.dart';
 import 'package:service_provider_app/features/services/views/edit_service_view.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/theme/qs_color_extension.dart';
@@ -453,7 +455,9 @@ import '../../../core/theme/qs_color_extension.dart';
 import '../../../core/storage/token_storage.dart';
 import '../repositories/manage_services_repository.dart';
 import '../viewmodels/service_details_viewmodel.dart';
+import '../viewmodels/edit_service_viewmodel.dart';
 import '../models/service_details_model.dart';
+import 'edit_service_schedule_view.dart';
 
 class ServiceDetailsView extends StatelessWidget {
   final int serviceId;
@@ -546,6 +550,10 @@ class _ServiceDetailsBody extends StatelessWidget {
 
           // 3. قسم الخدمات الفرعية
           _buildSubServicesSection(context, service, viewModel),
+          const SizedBox(height: 30),
+
+          // 4. قسم الجدول الزمني (المواعيد)
+          _buildScheduleSection(context, service, viewModel),
         ],
       ),
     );
@@ -624,7 +632,8 @@ class _ServiceDetailsBody extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Colors.white,
+        // color: context.qsColors.background,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -908,9 +917,16 @@ class _ServiceDetailsBody extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: context.qsColors.textSub.withOpacity(0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -1337,6 +1353,231 @@ class _ServiceDetailsBody extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // ==========================================
+  // الانتقال لصفحة تعديل/إضافة الجدولة
+  // ==========================================
+  void _navigateToAddEditSchedule(
+    BuildContext context,
+    ServiceDetailsModel service,
+    ServiceDetailsViewModel viewModel, {
+    ServiceScheduleModel? scheduleToEdit,
+  }) async {
+    final tokenStorage = TokenStorage();
+    final apiService = ApiService(tokenStorage);
+    final repository = ManageServicesRepository(apiService);
+
+    // ننتقل لصفحة التعديل وننتظر النتيجة
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => ServiceScheduleViewModel(
+            repository, 
+            service.id, 
+            initialSchedule: scheduleToEdit,
+          ),
+          child: const EditServiceScheduleView(),
+        ),
+      ),
+    );
+
+    // عند العودة، نقوم بتحديث البيانات لضمان ظهور التغييرات
+    viewModel.fetchServiceDetails();
+  }
+
+  Widget _buildScheduleSection(
+    BuildContext context,
+    ServiceDetailsModel service,
+    ServiceDetailsViewModel viewModel,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 20,
+              decoration: BoxDecoration(
+                color: context.qsColors.primary,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              context.tr('service_schedule'),
+              style: TextStyle(
+                color: context.qsColors.text,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: () => _navigateToAddEditSchedule(context, service, viewModel),
+              icon: Icon(Icons.add, size: 18, color: context.qsColors.primary),
+              label: Text(
+                'إضافة فترة',
+                style: TextStyle(
+                  color: context.qsColors.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                backgroundColor: context.qsColors.primary.withOpacity(0.1),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        
+        if (service.schedules.isEmpty)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Text(
+                'لا يوجد فترات عمل لهذه الخدمة',
+                style: TextStyle(color: context.qsColors.textSub),
+              ),
+            ),
+          )
+        else
+          ...service.schedules.map((schedule) {
+            String sTime = schedule.startTime;
+            String eTime = schedule.endTime;
+            if (sTime.length > 5) sTime = sTime.substring(0, 5);
+            if (eTime.length > 5) eTime = eTime.substring(0, 5);
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: schedule.isActive
+                      ? context.qsColors.primary.withOpacity(0.3)
+                      : context.qsColors.textSub.withOpacity(0.1),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        schedule.isActive ? Icons.event_available : Icons.event_busy,
+                        color: schedule.isActive ? context.qsColors.primary : context.qsColors.textSub,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          schedule.label ?? (schedule.isActive ? 'متاح' : 'غير متاح'),
+                          style: TextStyle(
+                            color: schedule.isActive ? context.qsColors.text : context.qsColors.textSub,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit, color: context.qsColors.primary, size: 20),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () => _navigateToAddEditSchedule(context, service, viewModel, scheduleToEdit: schedule),
+                      ),
+                      const SizedBox(width: 16),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () {
+                          if (schedule.id != null) {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: Text(context.tr('confirm_delete') ?? 'تأكيد الحذف'),
+                                content: const Text('هل متأكد أنك تريد حذف فترة العمل هذه؟'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    child: Text(context.tr('cancel') ?? 'إلغاء'),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                    onPressed: () async {
+                                      Navigator.pop(ctx);
+                                      await viewModel.deleteServiceSchedule(context, schedule.id!);
+                                    },
+                                    child: Text(context.tr('confirm') ?? 'حذف', style: const TextStyle(color: Colors.white)),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  const Divider(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.access_time, color: context.qsColors.textSub, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$sTime - $eTime',
+                        style: TextStyle(
+                          color: context.qsColors.textSub,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if (schedule.days.isNotEmpty)
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: schedule.days.map((day) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: context.qsColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            context.tr(day.toLowerCase()),
+                            style: TextStyle(
+                              color: context.qsColors.primary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                ],
+              ),
+            );
+          }).toList(),
+      ],
     );
   }
 }

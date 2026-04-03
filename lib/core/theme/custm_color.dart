@@ -22,13 +22,15 @@ class CustomColor {
   static const Color lightBackground = Color(0xFFF8FBFC);
 
   /// اللون الأساسي للتطبيق (أزرق متوسط).
+  // static const Color lightPrimary = Color(0xFF4F9CBF);
   static const Color lightPrimary = Color(0xFF4F9CBF);
 
   /// اللون الثانوي (أزرق فاتح).
   static const Color lightSecondary = Color(0xFF92C9E3);
 
   /// لون التمييز (Accent Color).
-  static const Color lightAccent = Color(0xFF67BDE4);
+  // static const Color lightAccent = Color(0xFF67BDE4);
+  static const Color lightAccent = Color(0xFF1CB0F6);
 
   // ===========================================================================
   // 🌙 ألوان الثيم الداكن (Dark Mode Colors)

@@ -29,9 +29,15 @@ class AppLocalizations {
     return true;
   }
 
-  // دالة الترجمة التي تبحث عن الكلمة
-  String translate(String key) {
-    return _localizedStrings[key] ?? key; // إذا لم يجد الكلمة، يعرض الـ key نفسه
+  // دالة الترجمة التي تبحث عن الكلمة وتدعم استبدال المتغيرات
+  String translate(String key, {Map<String, String>? args}) {
+    String translation = _localizedStrings[key] ?? key;
+    if (args != null) {
+      args.forEach((placeholder, value) {
+        translation = translation.replaceAll('{$placeholder}', value);
+      });
+    }
+    return translation;
   }
 }
 
@@ -58,8 +64,8 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
 // 🚀 Extension احترافي لتسهيل الاستخدام في الواجهات
 // ===================================================================
 extension TranslateExtension on BuildContext {
-  /// دالة لجلب النص المترجم بسهولة، استخدمها هكذا: context.tr('key')
-  String tr(String key) {
-    return AppLocalizations.of(this)?.translate(key) ?? key;
+  /// دالة لجلب النص المترجم بسهولة، تدعم المتغيرات أيضا: context.tr('key', args: {'id': '123'})
+  String tr(String key, {Map<String, String>? args}) {
+    return AppLocalizations.of(this)?.translate(key, args: args) ?? key;
   }
 }

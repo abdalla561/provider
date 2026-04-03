@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../repositories/verification_repository.dart';
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/utils/dialog_helper.dart';
 
 class VerificationViewModel extends ChangeNotifier {
   final VerificationRepository repository;
@@ -13,6 +14,8 @@ class VerificationViewModel extends ChangeNotifier {
 
   File? selectedImage;
   final TextEditingController bondNumberController = TextEditingController();
+  final TextEditingController contentController =
+      TextEditingController(); // للميزة الجديدة
 
   bool isLoading = false;
 
@@ -33,17 +36,19 @@ class VerificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 🚀 إرسال الطلب للسيرفر
+  // 🚀 إرسال طلب التوثيق عبر الباقات (سند وصورة)
   Future<void> submitVerification(BuildContext context, int packageId) async {
     if (selectedImage == null) {
-      _showSnackBar(context, context.tr('upload_image_validation'), Colors.red);
+      DialogHelper.showErrorDialog(
+        context,
+        context.tr('upload_image_validation'),
+      );
       return;
     }
     if (bondNumberController.text.trim().isEmpty) {
-      _showSnackBar(
+      DialogHelper.showErrorDialog(
         context,
         context.tr('enter_bond_number_validation'),
-        Colors.red,
       );
       return;
     }
@@ -61,33 +66,60 @@ class VerificationViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
 
-      _showSnackBar(
+      await DialogHelper.showSuccessDialog(
         context,
         context.tr('verification_submitted_success'),
-        Colors.green,
       );
 
-      // العودة للصفحة السابقة بعد النجاح
-      Navigator.pop(context);
+      if (context.mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
     } catch (e) {
       isLoading = false;
       notifyListeners();
-      _showSnackBar(context, e.toString(), Colors.red);
+      if (context.mounted) {
+        DialogHelper.showErrorDialog(context, e.toString());
+      }
     }
   }
 
-  void _showSnackBar(BuildContext context, String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message, style: const TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: color,
-      ),
-    );
+  // 🛡️ إرسال طلب توثيق جديد (Content فقط)
+  Future<void> submitContentRequest(BuildContext context) async {
+    if (contentController.text.trim().isEmpty) {
+      DialogHelper.showErrorDialog(context, 'الرجاء كتابة محتوى طلب التوثيق');
+      return;
+    }
+
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await repository.sendVerificationRequest(contentController.text.trim());
+
+      isLoading = false;
+      notifyListeners();
+
+      await DialogHelper.showSuccessDialog(
+        context,
+        'تم إرسال طلب التوثيق بنجاح، سيتم مراجعته قريباً',
+      );
+
+      if (context.mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    } catch (e) {
+      isLoading = false;
+      notifyListeners();
+      if (context.mounted) {
+        DialogHelper.showErrorDialog(context, e.toString());
+      }
+    }
   }
 
   @override
   void dispose() {
     bondNumberController.dispose();
+    contentController.dispose();
     super.dispose();
   }
 }

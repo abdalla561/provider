@@ -7,6 +7,7 @@ import 'package:service_provider_app/core/network/api_endpoints.dart';
 import 'package:service_provider_app/core/network/error/api_error_handler.dart';
 import 'package:service_provider_app/core/storage/hive_keys.dart';
 import '../models/commission_model.dart';
+import '../models/provider_commission_summary_model.dart';
 
 class CommissionsRepository {
   final ApiService _apiService;
@@ -86,6 +87,32 @@ class CommissionsRepository {
       );
       ApiErrorHandler.handleResponse(response);
     } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  /// 📊 جلب ملخص العمولات المستحقة (نقطة 5.8) (API + Hive)
+  Future<ProviderCommissionSummaryModel> getProviderCommissionSummary() async {
+    var box = Hive.box(HiveKeys.settingsBox);
+    final String summaryCacheKey = 'cached_provider_commission_summary';
+
+    try {
+      final response = await _apiService.get(ApiEndpoints.providerCommissionSummary);
+      final data = ApiErrorHandler.handleResponse(response);
+      
+      // استخراج البيانات من مفتاح 'data' إذا وجد
+      final Map<String, dynamic> responseData = data['data'] ?? data;
+
+      // 💾 تحديث الكاش
+      await box.put(summaryCacheKey, responseData);
+      
+      return ProviderCommissionSummaryModel.fromJson(responseData);
+    } catch (e) {
+      // 🔄 جلب من الكاش في حال الفشل
+      final cachedData = box.get(summaryCacheKey);
+      if (cachedData != null) {
+        return ProviderCommissionSummaryModel.fromJson(Map<String, dynamic>.from(cachedData));
+      }
       throw ApiErrorHandler.handle(e);
     }
   }

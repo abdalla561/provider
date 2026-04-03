@@ -10,14 +10,22 @@ import '../../../../core/theme/qs_color_extension.dart';
 
 class ServiceCardWidget extends StatelessWidget {
   final ServiceModel service;
+  final Function(ServiceModel)? onToggleStatus;
+  final Future<bool?> Function()? onTapOverride;
 
-  const ServiceCardWidget({super.key, required this.service});
+  const ServiceCardWidget({
+    super.key, 
+    required this.service,
+    this.onToggleStatus,
+    this.onTapOverride,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isActive = service.status == 'نشط';
-    final statusColor = isActive ? Colors.green.shade600 : context.qsColors.textSub;
-    final statusBgColor = isActive ? Colors.green.withOpacity(0.1) : context.qsColors.textSub.withOpacity(0.1);
+    final viewModel = Provider.of<ManageServicesViewModel>(context, listen: false);
+    final isActive = service.status == 'نشط' || service.isActive;
+    final statusColor = isActive ? Colors.green.shade600 : Colors.red.shade600;
+    final statusBgColor = isActive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1);
 
     return GestureDetector(
       // onTap: () {
@@ -29,6 +37,14 @@ class ServiceCardWidget extends StatelessWidget {
       // },
 
       onTap: () async {
+        if (onTapOverride != null) {
+          final shouldRefresh = await onTapOverride!();
+          if (shouldRefresh == true) {
+             Provider.of<ManageServicesViewModel>(context, listen: false).fetchServices();
+          }
+          return;
+        }
+
         // ننتظر النتيجة العائدة من شاشة التفاصيل
         final shouldRefresh = await Navigator.push(
           context,
@@ -44,10 +60,17 @@ class ServiceCardWidget extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: isActive ? Colors.white : Colors.red.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: context.qsColors.textSub.withOpacity(0.05),
+          ),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
           ],
         ),
         child: Column(
@@ -62,10 +85,35 @@ class ServiceCardWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: statusBgColor, borderRadius: BorderRadius.circular(8)),
-                        child: Text(service.status, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Transform.scale(
+                            scale: 0.8,
+                              child: Switch.adaptive(
+                                value: service.isActive,
+                                onChanged: (_) {
+                                  if (onToggleStatus != null) {
+                                    onToggleStatus!(service);
+                                  } else {
+                                    viewModel.toggleServiceStatus(service);
+                                  }
+                                },
+                                activeColor: Colors.green.shade600,
+                                inactiveThumbColor: Colors.red.shade600,
+                                inactiveTrackColor: Colors.red.withOpacity(0.2),
+                              ),
+                          ),
+                          const SizedBox(width: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(color: statusBgColor, borderRadius: BorderRadius.circular(8)),
+                            child: Text(
+                              service.status,
+                              style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 8),
                       Text(service.title, style: TextStyle(color: context.qsColors.text, fontSize: 16, fontWeight: FontWeight.bold)),

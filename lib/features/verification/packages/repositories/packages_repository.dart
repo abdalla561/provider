@@ -170,11 +170,14 @@ class PackagesRepository {
       // 🚀 التعديل الجوهري هنا: فحص نوع البيانات بذكاء
       List responseList = [];
       if (data is List) {
-        // إذا كان السيرفر يرسل مصفوفة مباشرة [...] مثل حالتك الآن
+        // إذا كان السيرفر يرسل مصفوفة مباشرة [...]
         responseList = data;
       } else if (data is Map && data.containsKey('data')) {
         // إذا كان السيرفر يرسلها داخل كائن {"data": [...]}
         responseList = data['data'];
+      } else if (data is Map && data.containsKey('packages')) {
+        // ✅ إضافة دعم لمفتاح packages القادم من السيرفر حالياً
+        responseList = data['packages'];
       }
 
       // حفظ البيانات في Hive لتكون متاحة (أوفلاين)
@@ -212,12 +215,13 @@ class PackagesRepository {
   }) async {
     try {
       FormData formData = FormData.fromMap({
-        'package_id': packageId,
-        'bond_number': bondNumber,
-        'bank_name': bankName,
-        'bond_image': await MultipartFile.fromFile(
+        'verification_package_id': packageId.toString(),
+        'number_bond': bondNumber,
+        'bank_name': 'تحويل بنكي مباشر', // ✅ حقل احتياطي لمتطلبات السيرفر
+        'image_bond': await MultipartFile.fromFile(
           bondImage.path,
-          filename: bondImage.path.split('/').last,
+          // ✅ تحسين استخراج اسم الملف لضمان توافق الامتداد مع السيرفر
+          filename: bondImage.path.split(RegExp(r'[/\\]')).last,
         ),
       });
 
@@ -228,6 +232,7 @@ class PackagesRepository {
 
       ApiErrorHandler.handleResponse(response);
     } catch (e) {
+      print('===========$e');
       throw ApiErrorHandler.handle(e);
     }
   }

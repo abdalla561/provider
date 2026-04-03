@@ -140,7 +140,40 @@ class ManageServicesViewModel extends ChangeNotifier {
       _isLoading = false;
       _errorMessage = 'حدث خطأ غير متوقع';
       debugPrint('❌ حدث خطأ غير متوقع: $e');
-      notifyListeners();
+    }
+  }
+
+  Future<void> toggleServiceStatus(ServiceModel service) async {
+    try {
+      // تحديث متفائل للواجهة (Optimistic Update)
+      int index = _allServices.indexWhere((s) => s.id == service.id);
+      if (index != -1) {
+        bool newStatus = !service.isActive;
+        _allServices[index] = ServiceModel(
+          id: service.id,
+          title: service.title,
+          priceText: service.priceText,
+          status: newStatus ? 'نشط' : 'غير نشط',
+          isActive: newStatus,
+          imageUrl: service.imageUrl,
+          subServicesCount: service.subServicesCount,
+          isExpanded: service.isExpanded,
+          quickServices: service.quickServices,
+        );
+        notifyListeners();
+
+        // إرسال الطلب للسيرفر
+        await _repository.updateService(
+          serviceId: service.id,
+          isActive: newStatus,
+        );
+        
+        debugPrint('✅ تم تحديث حالة الخدمة بنجاح');
+      }
+    } catch (e) {
+      debugPrint('❌ فشل تحديث حالة الخدمة: $e');
+      // إعادة جلب البيانات في حال الفشل للتأكد من المزامنة
+      await fetchServices();
     }
   }
 }

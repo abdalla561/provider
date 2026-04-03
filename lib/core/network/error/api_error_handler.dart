@@ -108,18 +108,7 @@ class ApiErrorHandler {
     try {
       final statusCode = response?.statusCode;
 
-      // 🎯 1. نلتقط الأخطاء الحساسة أولاً لنعرض رسائلنا المخصصة (بالعربي)
-      if (statusCode == 403) {
-        return 'عذراً، حسابك الحالي لا يملك صلاحية (مقدم خدمة) للقيام بهذا الإجراء.';
-      } else if (statusCode == 401) {
-        return 'انتهت جلسة الدخول، يرجى تسجيل الدخول مجدداً.';
-      } else if (statusCode == 404) {
-        return 'الرابط المطلوب غير موجود (Not Found).';
-      } else if (statusCode != null && statusCode >= 500) {
-        return 'يوجد خلل في السيرفر حالياً، يرجى المحاولة لاحقاً.';
-      }
-
-      // 🎯 2. إذا لم يكن من الأخطاء السابقة، نحاول قراءة الرسالة القادمة من الباك اند
+      // 🎯 1. نحاول أولاً قراءة الرسالة التفصيلية القادمة من الباك اند (سواء 400 أو 500 أو غيره)
       if (response != null && response.data != null) {
         if (response.data is Map) {
           if (response.data.containsKey('message')) {
@@ -127,9 +116,20 @@ class ApiErrorHandler {
           } else if (response.data.containsKey('error')) {
             return response.data['error'];
           }
-        } else if (response.data is String) {
-          return response.data;
+        } else if (response.data is String && response.data!.isNotEmpty) {
+          return response.data!;
         }
+      }
+
+      // 🎯 2. إذا لم يرسل الباك اند رسالة، نستخدم رسائلنا المخصصة حسب الكود
+      if (statusCode == 403) {
+        return 'عذراً، حسابك الحالي لا يملك صلاحية (مقدم خدمة) للقيام بهذا الإجراء.';
+      } else if (statusCode == 401) {
+        return 'انتهت جلسة الدخول، يرجى تسجيل الدخول مجدداً.';
+      } else if (statusCode == 404) {
+        return 'الرابط المطلوب غير موجود (Not Found).';
+      } else if (statusCode != null && statusCode >= 500) {
+        return 'يوجد خلل في السيرفر حالياً (Internal Server Error).';
       }
 
       // 🎯 3. كود احتياطي للأخطاء الأخرى غير المعروفة

@@ -9,7 +9,7 @@ class CommissionsViewModel extends ChangeNotifier {
   final CommissionsRepository _repository;
 
   CommissionsViewModel(this._repository) {
-    // تبدأ بجلب البيانات فوراً لضمان سرعة العرض
+    // جلب بيانات العمولات فوراً
     fetchCommissionsData();
   }
 
@@ -34,8 +34,8 @@ class CommissionsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 🚀 تم ربطها بالـ API الحقيقي كما طلبت (عبر الـ Repository)
       _commissionsData = await _repository.getCommissionsData();
+
       _isLoading = false;
       notifyListeners();
     } on Failure catch (failure) {
@@ -52,7 +52,7 @@ class CommissionsViewModel extends ChangeNotifier {
   // فلترة التعاملات المالية حسب التبويب المختار
   List<CommissionTransactionModel> get filteredTransactions {
     if (_commissionsData == null) return [];
-    
+
     final all = _commissionsData!.transactions;
 
     if (_selectedTabIndex == 0) {
@@ -60,7 +60,9 @@ class CommissionsViewModel extends ChangeNotifier {
     } else if (_selectedTabIndex == 1) {
       return all.where((t) => t.status == 'completed').toList(); // مدفوع
     } else {
-      return all.where((t) => t.status == 'pending' || t.status == 'processing').toList(); // معلق أو قيد المعالجة
+      return all
+          .where((t) => t.status == 'pending' || t.status == 'processing')
+          .toList(); // معلق أو قيد المعالجة
     }
   }
 

@@ -26,17 +26,19 @@ class PackageModel {
     if (json['features'] != null && json['features'] is List) {
       parsedFeatures = List<String>.from(json['features']);
     } else {
-      parsedFeatures = ['شارة توثيق مميزة', 'أولوية في البحث', 'دعم فني مخصص'];
+      // ✅ نستخدم الوصف القادم من السيرفر هنا بدلاً من النص الثابت
+      String description = json['description'] ?? 'خيار ممتاز لزيادة الموثوقية';
+      parsedFeatures = [description, 'أولوية في البحث', 'دعم فني مخصص'];
     }
 
     return PackageModel(
       id: json['id'] ?? 0,
       title: json['name'] ?? json['title'] ?? 'باقة توثيق',
       price: double.tryParse(json['price'].toString()) ?? 0.0,
-      duration:
-          json['duration'] ??
-          json['description'] ??
-          'خيار ممتاز لزيادة الموثوقية',
+      duration: json['duration'] ??
+          (json['duration_days'] != null
+              ? '${json['duration_days']} يوم'
+              : json['description'] ?? 'خيار ممتاز لزيادة الموثوقية'),
       features: parsedFeatures,
       badgeText: json['badge'] ?? (isPop ? 'الأكثر طلباً' : 'باقة مميزة'),
       isPopular: isPop,

@@ -10,7 +10,7 @@ import '../../../core/theme/qs_color_extension.dart';
 import '../../../core/storage/token_storage.dart';
 import '../repositories/manage_services_repository.dart';
 import '../viewmodels/edit_service_viewmodel.dart';
-import 'dart:io';
+import 'edit_service_schedule_view.dart';
 
 class EditServiceView extends StatelessWidget {
   final ServiceDetailsModel service; // استقبال بيانات الخدمة
@@ -62,9 +62,8 @@ class _EditServiceBody extends StatelessWidget {
         backgroundColor: context.qsColors.background,
         elevation: 0,
         centerTitle: true,
-        // تأكد من إضافة 'edit_service' في ملفات الترجمة لديك
         title: Text(
-          context.tr('edit_service') ?? 'تعديل الخدمة',
+          context.tr('edit_service'),
           style: TextStyle(
             color: context.qsColors.text,
             fontWeight: FontWeight.bold,
@@ -89,16 +88,21 @@ class _EditServiceBody extends StatelessWidget {
                 width: double.infinity,
                 height: 180,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: context.qsColors.textSub.withOpacity(0.3),
-                    width: 2,
-                    style: BorderStyle.solid,
+                    color: context.qsColors.textSub.withOpacity(0.15),
+                    width: 1,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                   image: imageDecoration,
                 ),
-                // إذا لم يكن هناك صورة جديدة ولا صورة قديمة، اعرض الأيقونة
                 child: (viewModel.imageFile == null && service.imageUrl.isEmpty)
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -110,8 +114,7 @@ class _EditServiceBody extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            context.tr('change_service_image') ??
-                                'تغيير صورة الخدمة',
+                            context.tr('change_service_image'),
                             style: TextStyle(
                               color: context.qsColors.text,
                               fontWeight: FontWeight.bold,
@@ -188,6 +191,34 @@ class _EditServiceBody extends StatelessWidget {
               hint: context.tr('service_description_hint'),
               maxLines: 4,
             ),
+            const SizedBox(height: 16),
+
+            // ==========================================
+            // 3.1. حالة الخدمة (نشط / غير نشط)
+            // ==========================================
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildLabel(context, context.tr('service_status')),
+                Switch.adaptive(
+                  value: viewModel.isActive,
+                  onChanged: viewModel.setIsActive,
+                  activeColor: context.qsColors.primary,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // ==========================================
+            // 3.2. تسعير المسافة
+            // ==========================================
+            _buildDistancePricingSection(context, viewModel),
+            const SizedBox(height: 24),
+
+            // ==========================================
+            // 3.2. جدولة الخدمة (الانتقال لصفحة مستقلة)
+            // ==========================================
+            _buildScheduleConfigButton(context),
 
             const SizedBox(height: 40),
 
@@ -212,10 +243,8 @@ class _EditServiceBody extends StatelessWidget {
                         if (success && context.mounted) {
                           await DialogHelper.showSuccessDialog(
                             context,
-                            context.tr('service_updated_successfully') ??
-                                'تم حفظ التعديلات بنجاح!',
+                            context.tr('service_updated_successfully'),
                           );
-                          // نرسل true للشاشة السابقة لتعرف أنه تم التحديث
                           Navigator.pop(context, true);
                         }
                       },
@@ -225,7 +254,7 @@ class _EditServiceBody extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            context.tr('save_changes') ?? 'حفظ التعديلات',
+                            context.tr('save_changes'),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -437,6 +466,128 @@ class _EditServiceBody extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDistancePricingSection(
+    BuildContext context,
+    EditServiceViewModel viewModel,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildLabel(context, context.tr('distance_based_price')),
+            Switch.adaptive(
+              value: viewModel.distanceBasedPrice,
+              onChanged: viewModel.setDistanceBasedPrice,
+              activeColor: context.qsColors.primary,
+            ),
+          ],
+        ),
+        if (viewModel.distanceBasedPrice) ...[
+          const SizedBox(height: 8),
+          _buildLabel(context, context.tr('price_per_km')),
+          _buildPriceField(context, viewModel.pricePerKmController),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildScheduleConfigButton(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 20,
+              decoration: BoxDecoration(
+                color: context.qsColors.primary,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              context.tr('service_schedule'),
+              style: TextStyle(
+                color: context.qsColors.text,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChangeNotifierProvider.value(
+                  value: Provider.of<EditServiceViewModel>(context, listen: false),
+                  child: const EditServiceScheduleView(),
+                ),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: context.qsColors.primary.withOpacity(0.2),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: context.qsColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.calendar_month_outlined,
+                      color: context.qsColors.primary, size: 24),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.tr('configure_schedule') ?? 'إعداد جدول المواعيد',
+                        style: TextStyle(
+                          color: context.qsColors.text,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        context.tr('configure_schedule_hint') ??
+                            'حدد أيام العمل وساعات التوفر',
+                        style: TextStyle(
+                          color: context.qsColors.textSub,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios,
+                    color: context.qsColors.primary, size: 16),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

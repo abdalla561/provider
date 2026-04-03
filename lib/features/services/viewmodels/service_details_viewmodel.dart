@@ -259,5 +259,31 @@ class ServiceDetailsViewModel extends ChangeNotifier {
       DialogHelper.showErrorDialog(context, 'حدث خطأ أثناء الحذف');
     }
   }
+
+  // 🚀 دالة حذف الموعد (الجدولة)
+  Future<void> deleteServiceSchedule(BuildContext context, int scheduleId) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _repository.deleteServiceSchedule(scheduleId);
+      
+      // إعادة تحميل تفاصيل الخدمة بعد الحذف لتحديث قائمة المواعيد
+      await fetchServiceDetails();
+      
+      if (context.mounted) {
+        DialogHelper.showSuccessDialog(context, 'تم حذف الفترة بنجاح');
+      }
+
+    } on Failure catch (failure) {
+      _isLoading = false;
+      notifyListeners();
+      DialogHelper.showErrorDialog(context, failure.message);
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      DialogHelper.showErrorDialog(context, 'حدث خطأ أثناء الحذف');
+    }
+  }
 }
  

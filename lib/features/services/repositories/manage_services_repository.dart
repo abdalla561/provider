@@ -1,17 +1,19 @@
 // مسار الملف: lib/features/services/repositories/manage_services_repository.dart
 
-import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:service_provider_app/core/network/api_client.dart';
 import 'package:service_provider_app/core/network/api_endpoints.dart';
 import 'package:service_provider_app/core/network/error/api_error_handler.dart';
 import 'package:service_provider_app/features/services/models/category_model.dart';
 import 'package:service_provider_app/features/services/models/service_details_model.dart';
+// import 'package:service_provider_app/features/services/models/service_list_model.dart';
 import '../../../core/storage/hive_keys.dart';
 import '../models/manage_services_model.dart';
 // أضف هذا الاستيراد في أعلى الملف لرفع الملفات
 import 'package:dio/dio.dart';
 import 'dart:io';
+import 'dart:convert';
+import '../models/service_schedule_model.dart';
 
 class ManageServicesRepository {
   final ApiService _apiService;
@@ -65,6 +67,9 @@ class ManageServicesRepository {
     required double price,
     required int categoryId,
     required int requiredPartialPercent,
+    bool distanceBasedPrice = false,
+    double pricePerKm = 0.0,
+    List<ServiceScheduleModel>? schedules,
     File? imageFile,
   }) async {
     try {
@@ -72,14 +77,38 @@ class ManageServicesRepository {
       FormData formData = FormData.fromMap({
         "name": name,
         "description": description,
-        "price": price,
-        "category_id": categoryId,
+        "price": price.toString(),
+        "category_id": categoryId.toString(),
         "status": "available", // قيمة افتراضية حسب وثيقة الباك اند
-        "is_available": 1,
-        "is_active": 1,
-        "distance_based_price": 0,
-        "required_partial_percentage": requiredPartialPercent,
+        "is_available": "1",
+        "is_active": "1",
+        "distance_based_price": (distanceBasedPrice ? 1 : 0).toString(),
+        "price_per_km": pricePerKm.toString(),
+        "required_partial_percentage": requiredPartialPercent.toString(),
       });
+
+      // إضافة الجداول الزمنية إذا وجدت
+      if (schedules != null && schedules.isNotEmpty) {
+        for (int i = 0; i < schedules.length; i++) {
+          final schedule = schedules[i];
+          formData.fields.addAll([
+            MapEntry(
+              "schedules[$i][start_time]",
+              schedule.startTime.toString(),
+            ),
+            MapEntry("schedules[$i][end_time]", schedule.endTime.toString()),
+            MapEntry("schedules[$i][is_active]", schedule.isActive ? "1" : "0"),
+          ]);
+          for (int j = 0; j < schedule.days.length; j++) {
+            formData.fields.add(
+              MapEntry(
+                "schedules[$i][days][$j]",
+                schedule.days[j].toLowerCase(),
+              ),
+            );
+          }
+        }
+      }
 
       // إضافة الصورة إذا قام المستخدم باختيارها
       if (imageFile != null) {
@@ -135,20 +164,67 @@ class ManageServicesRepository {
     }
   }
 
-  // 🚀 دالة جلب تفاصيل خدمة واحدة (GET /services/{id})
+  // 🚀 دالة جلب الخدمات المخصصة
+  Future<List<ServiceModel>> getCustomServices() async {
+    try {
+      final response = await _apiService.get('/services-custom');
+      final data = ApiErrorHandler.handleResponse(response);
+      
+      if (data is Map) {
+        // إذا كان الباك إند يعيد كائن خدمة واحد (تم استخراج الـ data تلقائياً في الـ ErrorHandler)
+        return [ServiceModel.fromJson(Map<String, dynamic>.from(data))];
+      } else if (data is List) {
+        // إذا كان مصفوفة، نعاملها كقائمة خدمات
+        return data.map((e) => ServiceModel.fromJson(e)).toList();
+      }
+      return [];
+    } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // 🚀 دالة جلب خدمات الحضور
+  Future<List<ServiceModel>> getMeetingServices() async {
+    try {
+      final response = await _apiService.get('/services-meeting');
+      final data = ApiErrorHandler.handleResponse(response);
+      
+      if (data is Map) {
+        // إذا كان الباك إند يعيد كائن خدمة واحد
+        return [ServiceModel.fromJson(Map<String, dynamic>.from(data))];
+      } else if (data is List) {
+        return data.map((e) => ServiceModel.fromJson(e)).toList();
+      }
+      return [];
+    } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // 🚀 دالة جلب تفاصيل خدمة واحدة (GET /services/{id}) (API + Hive)
   Future<ServiceDetailsModel> getServiceDetails(int id) async {
+    var box = Hive.box(HiveKeys.settingsBox);
+    final String detailsCacheKey = 'cached_service_details_$id';
+
     try {
       final response = await _apiService.get('${ApiEndpoints.myServices}/$id');
       final data = ApiErrorHandler.handleResponse(response);
-      // 🕵️‍♂️ سطر الطباعة السحري لاكتشاف ما يرسله الباك اند بالضبط
-      debugPrint('=========================================');
-      debugPrint('👀 بيانات تفاصيل الخدمة القادمة من السيرفر:');
-      debugPrint(data.toString());
-      debugPrint('=========================================');
+
       // عادة السيرفر يرسل التفاصيل داخل 'data' أو مباشرة
       final Map<String, dynamic> responseData = data['data'] ?? data;
+
+      // 💾 تحديث الكاش
+      await box.put(detailsCacheKey, responseData);
+
       return ServiceDetailsModel.fromJson(responseData);
     } catch (e) {
+      // 🔄 جلب من الكاش في حال الفشل
+      final cachedData = box.get(detailsCacheKey);
+      if (cachedData != null) {
+        return ServiceDetailsModel.fromJson(
+          Map<String, dynamic>.from(cachedData),
+        );
+      }
       throw ApiErrorHandler.handle(e);
     }
   }
@@ -190,22 +266,70 @@ class ManageServicesRepository {
   // 🚀 دالة تحديث بيانات الخدمة (POST مع خدعة _method=PUT لارافيل)
   Future<void> updateService({
     required int serviceId,
-    required String name,
-    required String description,
-    required double price,
-    required int categoryId,
-    required int requiredPartialPercent,
+    String? name,
+    String? description,
+    double? price,
+    int? categoryId,
+    int? requiredPartialPercent,
+    bool? isActive,
+    bool distanceBasedPrice = false,
+    double pricePerKm = 0.0,
+    List<ServiceScheduleModel>? schedules,
     File? imageFile,
   }) async {
     try {
       FormData formData = FormData.fromMap({
-        "_method": "PUT", // 👈 السر هنا ليعمل التعديل مع الصور في لارافيل
-        "name": name,
-        "description": description,
-        "price": price,
-        "category_id": categoryId,
-        "required_partial_percent": requiredPartialPercent,
+        "_method": "PUT",
+        if (name != null) "name": name,
+        if (description != null) "description": description,
+        if (price != null) "price": price.toString(),
+        if (categoryId != null) "category_id": categoryId.toString(),
+        if (requiredPartialPercent != null)
+          "required_partial_percentage": requiredPartialPercent.toString(),
+        if (isActive != null) "is_active": (isActive ? 1 : 0).toString(),
+        "distance_based_price": (distanceBasedPrice ? 1 : 0).toString(),
+        "price_per_km": pricePerKm.toString(),
       });
+
+      // إضافة الجداول الزمنية لتعديلها
+      if (schedules != null && schedules.isNotEmpty) {
+        print("========$schedules");
+        for (int i = 0; i < schedules.length; i++) {
+          final schedule = schedules[i];
+          if (schedule.days.isNotEmpty) {
+            formData.fields.add(
+              MapEntry("schedules[$i][start_time]", schedule.startTime),
+            );
+            formData.fields.add(
+              MapEntry("schedules[$i][end_time]", schedule.endTime),
+            );
+            formData.fields.add(
+              MapEntry(
+                "schedules[$i][is_active]",
+                schedule.isActive ? "1" : "0",
+              ),
+            );
+            if (schedule.label != null) {
+              formData.fields.add(
+                MapEntry("schedules[$i][label]", schedule.label!),
+              );
+            }
+            if (schedule.id != null) {
+              formData.fields.add(
+                MapEntry("schedules[$i][id]", schedule.id.toString()),
+              );
+            }
+            for (int j = 0; j < schedule.days.length; j++) {
+              formData.fields.add(
+                MapEntry(
+                  "schedules[$i][days][$j]",
+                  schedule.days[j].toLowerCase(),
+                ),
+              );
+            }
+          }
+        }
+      }
 
       if (imageFile != null) {
         formData.files.add(
@@ -222,6 +346,67 @@ class ManageServicesRepository {
       final response = await _apiService.post(
         '${ApiEndpoints.myServices}/$serviceId',
         data: formData,
+      );
+      ApiErrorHandler.handleResponse(response);
+    } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // ==========================================
+  // إدراة مواعيد الخدمة (Schedules CRUD)
+  // ==========================================
+
+  // إضافة موعد جديد
+  Future<void> addServiceSchedule({
+    required int serviceId,
+    required String startTime,
+    required String endTime,
+    required List<String> days,
+  }) async {
+    try {
+      final response = await _apiService.post(
+        '${ApiEndpoints.myServices}/schedules',
+        data: {
+          "service_id": serviceId,
+          "start_time": startTime,
+          "end_time": endTime,
+          "days": days.map((d) => d.toLowerCase()).toList(),
+        },
+      );
+      ApiErrorHandler.handleResponse(response);
+    } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // تعديل موعد موجود
+  Future<void> updateServiceSchedule({
+    required int scheduleId,
+    required String startTime,
+    required String endTime,
+    required List<String> days,
+  }) async {
+    try {
+      final response = await _apiService.put(
+        '${ApiEndpoints.myServices}/schedules/$scheduleId',
+        data: {
+          "start_time": startTime,
+          "end_time": endTime,
+          "days": days.map((d) => d.toLowerCase()).toList(),
+        },
+      );
+      ApiErrorHandler.handleResponse(response);
+    } catch (e) {
+      throw ApiErrorHandler.handle(e);
+    }
+  }
+
+  // حذف موعد
+  Future<void> deleteServiceSchedule(int scheduleId) async {
+    try {
+      final response = await _apiService.delete(
+        '${ApiEndpoints.myServices}/schedules/$scheduleId',
       );
       ApiErrorHandler.handleResponse(response);
     } catch (e) {

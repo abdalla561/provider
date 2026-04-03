@@ -182,7 +182,8 @@ import 'package:service_provider_app/features/services/models/service_details_mo
 
 // الاستدعاءات الخاصة بالـ Repository والـ Model
 import '../repositories/manage_services_repository.dart';
-import '../models/category_model.dart'; // ✅ تم إضافة استدعاء المودل هنا
+import '../models/category_model.dart';
+import '../models/service_schedule_model.dart';
 
 class AddServiceViewModel extends ChangeNotifier {
   final ManageServicesRepository _repository;
@@ -190,6 +191,7 @@ class AddServiceViewModel extends ChangeNotifier {
 
   // ✅ دالة البناء الصحيحة والمدمجة (واحدة فقط)
   AddServiceViewModel(this._repository, {this.serviceToEdit}) {
+    _initSchedules();
     fetchCategories().then((_) {
       _initEditData();
     });
@@ -202,6 +204,52 @@ class AddServiceViewModel extends ChangeNotifier {
   final TextEditingController priceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController partialPercentController = TextEditingController();
+  final TextEditingController pricePerKmController = TextEditingController();
+
+  // =====================================
+  // 1.1. إعدادات السعر والمسافة
+  // =====================================
+  bool _distanceBasedPrice = false;
+  bool get distanceBasedPrice => _distanceBasedPrice;
+
+  void setDistanceBasedPrice(bool value) {
+    _distanceBasedPrice = value;
+    notifyListeners();
+  }
+
+  // =====================================
+  // 1.2. الجدولة الزمنية (Schedules)
+  // =====================================
+  List<ServiceScheduleModel> _schedules = [];
+  List<ServiceScheduleModel> get schedules => _schedules;
+
+  void _initSchedules() {
+    final days = [
+      'Saturday',
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday'
+    ];
+    _schedules = days.map((day) => ServiceScheduleModel(days: [day])).toList();
+  }
+
+  void toggleDay(int index) {
+    _schedules[index] = _schedules[index].copyWith(isActive: !_schedules[index].isActive);
+    notifyListeners();
+  }
+
+  void updateStartTime(int index, String time) {
+    _schedules[index] = _schedules[index].copyWith(startTime: time);
+    notifyListeners();
+  }
+
+  void updateEndTime(int index, String time) {
+    _schedules[index] = _schedules[index].copyWith(endTime: time);
+    notifyListeners();
+  }
 
   // =====================================
   // 2. إدارة الفئات (Categories)
@@ -227,6 +275,24 @@ class AddServiceViewModel extends ChangeNotifier {
       priceController.text = serviceToEdit!.priceText.replaceAll(RegExp(r'[^0-9.]'), '');
       // If serviceToEdit has a property for partialPercent, we'd use it here.
       // But we'll leave it empty or default it if not available.
+      partialPercentController.text = serviceToEdit!.requiredPartialPercentage.toString();
+      _distanceBasedPrice = serviceToEdit!.distanceBasedPrice;
+      pricePerKmController.text = serviceToEdit!.pricePerKm.toString();
+      
+      if (serviceToEdit!.schedules.isNotEmpty) {
+        // نحدث الجداول الموجودة بالمخزنة في السيرفر
+        for (var remoteSchedule in serviceToEdit!.schedules) {
+          if (remoteSchedule.days.isNotEmpty) {
+            for (var remoteDay in remoteSchedule.days) {
+              int index = _schedules.indexWhere((s) => s.days.isNotEmpty && s.days.first == remoteDay);
+              if (index != -1) {
+                _schedules[index] = remoteSchedule.copyWith(days: [remoteDay]);
+              }
+            }
+          }
+        }
+      }
+      
       setCategory(serviceToEdit!.categoryId);
     }
   }
@@ -292,6 +358,9 @@ class AddServiceViewModel extends ChangeNotifier {
           price: double.parse(priceController.text.trim()),
           categoryId: _selectedCategoryId!,
           requiredPartialPercent: int.parse(partialPercentController.text.trim()),
+          distanceBasedPrice: _distanceBasedPrice,
+          pricePerKm: _distanceBasedPrice ? double.tryParse(pricePerKmController.text.trim()) ?? 0.0 : 0.0,
+          schedules: _schedules,
           imageFile: _imageFile,
         );
       } else {
@@ -302,6 +371,9 @@ class AddServiceViewModel extends ChangeNotifier {
           price: double.parse(priceController.text.trim()),
           categoryId: _selectedCategoryId!,
           requiredPartialPercent: int.parse(partialPercentController.text.trim()),
+          distanceBasedPrice: _distanceBasedPrice,
+          pricePerKm: _distanceBasedPrice ? double.tryParse(pricePerKmController.text.trim()) ?? 0.0 : 0.0,
+          schedules: _schedules,
           imageFile: _imageFile,
         );
       }

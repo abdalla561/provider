@@ -59,12 +59,14 @@
 // }
 
 // مسار الملف: lib/features/services/models/manage_services_model.dart
+import '../../../../core/network/api_endpoints.dart';
 
 class ServiceModel {
   final int id;
   final String title;
   final String priceText;
   final String status;
+  final bool isActive;
   final String imageUrl;
 
   final int subServicesCount;
@@ -77,6 +79,7 @@ class ServiceModel {
     required this.title,
     required this.priceText,
     required this.status,
+    required this.isActive,
     required this.imageUrl,
     required this.subServicesCount,
     this.isExpanded = false,
@@ -84,11 +87,8 @@ class ServiceModel {
   });
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
-    // تحديد حالة الخدمة
-    String currentStatus = 'غير نشط';
-    if (json['is_active'] == true || json['status'] == 'available') {
-      currentStatus = 'نشط';
-    }
+    bool active = json['is_active'] == 1 || json['is_active'] == true;
+    String currentStatus = active ? 'نشط' : 'غير نشط';
 
     // 🚀 التعديل هنا: معالجة مسار الصورة تماماً كما فعلنا في التفاصيل
     String rawImagePath = json['image_path'] ?? json['image_url'] ?? '';
@@ -98,8 +98,8 @@ class ServiceModel {
       if (rawImagePath.startsWith('http')) {
         finalImageUrl = rawImagePath;
       } else {
-        // إضافة رابط السيرفر المحلي لكي يفهم فلاتر أنه رابط إنترنت
-        finalImageUrl = 'http://127.0.0.1:8000/storage/$rawImagePath';
+        // إضافة رابط السيرفر لكي يفهم فلاتر أنه رابط إنترنت
+        finalImageUrl = '${ApiEndpoints.domain}/storage/$rawImagePath';
       }
     }
 
@@ -115,6 +115,7 @@ class ServiceModel {
       title: json['name'] ?? json['title'] ?? '',
       priceText: '${json['price'] ?? 0} ر.س',
       status: currentStatus,
+      isActive: active,
       imageUrl: finalImageUrl, // 🚀 التعديل هنا: نمرر الرابط المعالج
       subServicesCount: childList.length,
       isExpanded: childList.isNotEmpty,
